@@ -66,26 +66,26 @@ export class VooshSendFile extends BaseElement {
             margin: 12px;
         }
             
-              @media(max-width: 767px) {
-        wa-carousel {
-          width: 100dvw;
-          height: 100dvh;
-        }
-        wa-carousel-item {
-          width: 100%;
-          height: 100%;
-        }
-        .slide-content {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-          box-sizing: border-box;
-        }
-      }`;
+        @media(max-width: 767px) {
+            wa-carousel {
+            width: 100dvw;
+            height: 100dvh;
+            }
+            wa-carousel-item {
+            width: 100%;
+            height: 100%;
+            }
+            .slide-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            }
+        }`;
 
     @query('wa-carousel') carousel!: WaCarousel;
 
@@ -105,15 +105,13 @@ export class VooshSendFile extends BaseElement {
         const currentSlide = slides[activeIndex];
 
         if (currentSlide) {
-            // 3. Look for your specific Lit component inside the active slide
-            const specialComponents = currentSlide.children;
-
-            // 4. If found, safely invoke its specific code
-            for (let i = 0; i < specialComponents.length; ++i) {
-                const component = specialComponents[i];
-                if (component && "onSlideChanged" in component) {
-                    (component as any).onSlideChanged({ target: event.target, index: event.detail.index });
+            let queue = [ ...currentSlide.children ];
+            while (queue.length > 0) {
+                const queueHead = queue.shift()!;
+                if (queueHead && "onSlideChanged" in queueHead) {
+                    (queueHead as any).onSlideChanged({ target: event.target, currentSlide: currentSlide, index: event.detail.index });
                 }
+                queue = [...queue, ...queueHead.children];
             }
         }
     }
@@ -146,7 +144,8 @@ export class VooshSendFile extends BaseElement {
             <wa-carousel-item>
                 <div class="slide-contnent">
                     <h2>Escolha arquivo a upar</h2>
-                    <input type="file" id="send" class="${classMap(fileClassMap)}" @change=${this.onFileChangeEventHandler}></input>
+                    <input type="file" id="send" class="${classMap(fileClassMap)}" @change=${this.onFileChangeEventHandler}
+                        accept="audio/*,image/*,video/*,application/pdf,application/zip"></input>
                     <p>${this.errorMessage}</p>
                 </div>
             </wa-carousel-item>
