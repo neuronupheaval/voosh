@@ -91,11 +91,12 @@ export class VooshReceiveFile extends BaseElement {
                     (e.target as WaButton).disabled = true;
                     self.fileName = { value: details.fileName };
                     self.fileSize = { value: details.fileSize };
-                    const trs = this.shadowRoot!.querySelectorAll(`tr td:not([data-type="${details.sender}"`);
+                    const trs = this.shadowRoot!.querySelectorAll(`tr:has(td:nth-child(6):not([voosh-sender='${details.sender}']))`);
                     for (let i = 0; i < trs.length; ++i) {
                         const tr = (trs[i] as HTMLTableRowElement)
                         tr.style.transition = "opacity 0.8s ease";
                         tr.style.opacity = "0";
+                        setTimeout(() => tr.remove(), 800);
                     }
                     context.download();
                 }}><wa-icon name="arrow-down" style="font-size: 1rem; color: mediumseagreen;"></button>`,
@@ -222,7 +223,7 @@ export class VooshReceiveFile extends BaseElement {
                   row,
                   (_, colIndex) => `${rowIndex}-${colIndex}`, // Cell key
                   (cell, colIndex) => {
-                        if (colIndex === 5) return html`<td style="display:none" data-value="${cell}">&nbsp;</td>`;
+                        if (colIndex === 5) return html`<td voosh-sender="${cell}">\u00A0</td>`;
                         return rowIndex === 0 ? html`<th>${cell}</th>` : html`<td>${cell}</td>`;
                 })}
               </tr>`

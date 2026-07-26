@@ -227,7 +227,7 @@ export class VooshWebRtcClient {
 
                 case 'refrequest':
                     if (this.refRequestHandler) {
-                        const response = await this.refRequestHandler(message.payload as string);
+                        const response = await this.refRequestHandler(message.payload, message.sender);
                         if (response) {
                             console.log(`downloader candidate id [${message.sender}] gave me matching ref: [${message.payload}]`);
                             const payloadWithDetails = {

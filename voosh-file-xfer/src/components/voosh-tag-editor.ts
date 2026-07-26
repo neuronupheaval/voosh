@@ -15,7 +15,7 @@ export class VooshTagEditor extends BaseElement {
     content?: string = "";
 
     render() {
-        return html`<wa-input id="editor" appearance="filled-outlined" placeholder="ex: fotos praia setembro 2026" @keyup=${this.keyUpEventHandler} ?disabled=${this.tags.length >= 7}></wa-input>
+        return html`<wa-input id="editor" appearance="filled-outlined" placeholder="ex: fotos praia setembro 2026" @input=${this.inputEventHandler} ?disabled=${this.tags.length >= 7}></wa-input>
         <p id="bag">${
         repeat(
             this.tags,
@@ -46,17 +46,13 @@ export class VooshTagEditor extends BaseElement {
         }
     }
 
-    keyUpEventHandler(e: KeyboardEvent) {
+    inputEventHandler(e: any) {
         const textBox = e.target as WaInput;
-        const keyPressed = e.key || e.code;
+        const value = textBox.value;
+        const valueTrimmed = value?.trim() ?? "";
 
-        if (keyPressed === "Enter" || keyPressed === "Space" || keyPressed === " ") {
-            const content = textBox.value!.trim();
-            if (content === "") {
-                e.preventDefault();
-                return;   
-            }
-            this.tags = [...this.tags, content];
+        if (valueTrimmed !== "" && value?.endsWith(" ")) {
+            this.tags = [...this.tags, valueTrimmed];
             this.resetTagContentTextBox()
             this.triggerChangeEvent();
         }

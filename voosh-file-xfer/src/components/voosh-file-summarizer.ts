@@ -25,6 +25,11 @@ export class VooshFileSummarizer extends BaseElement {
         table, th, td {
             border: 1px solid var(--wa-color-neutral-300, #ccc);
             border-collapse: collapse;
+            padding: 8px;
+        }
+        table {
+            width: 100%;
+            min-width: 25wh;
         }
         tr td:nth-child(even) {
             text-align: right;
@@ -39,7 +44,7 @@ export class VooshFileSummarizer extends BaseElement {
                 <tbody>
                     <tr>
                         <td>Nome do arquivo</td>
-                        <td>${this.file?.name}</td>
+                        <td><voosh-marquee text=${this.file?.name}></voosh-marquee></td>
                     </tr>
                     <tr>
                         <td>Tamanho</td>

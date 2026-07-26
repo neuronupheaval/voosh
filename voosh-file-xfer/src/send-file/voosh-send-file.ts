@@ -1,6 +1,7 @@
 import "../components/voosh-file-summarizer";
 import "../components/voosh-tag-editor";
 import "../components/voosh-uploader";
+import "../components/voosh-file-input";
 import '@awesome.me/webawesome/dist/components/button/button.js';
 import '@awesome.me/webawesome/dist/components/carousel/carousel.js';
 import '@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js'
@@ -9,7 +10,6 @@ import { customElement, property, query, state } from "lit/decorators.js";
 import { Utility } from "../base/Utility";
 import { BaseElement } from "../base/BaseElement";
 import type WaCarousel from "@awesome.me/webawesome/dist/components/carousel/carousel.js";
-import { classMap } from "lit/directives/class-map.js";
 import { when } from "lit/directives/when.js";
 
 @customElement("voosh-send-file")
@@ -33,57 +33,50 @@ export class VooshSendFile extends BaseElement {
     ref?: string;
     
     static override styles?: CSSResultGroup | undefined = css`
-    .modern-file-input {
-            font-family: sans-serif;
-            color: #555;
+        wa-carousel-item {
+            align-items: normal;
         }
 
-        .file-input-error {
-            color: #a00;
-        }
-
-        .modern-file-input::file-selector-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+        .ok-button {
+            display: inline-block;
+            padding: 12px 24px;
             cursor: pointer;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
             font-weight: bold;
-            transition: background-color 0.3s ease;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .file-input-error::file-selector-button {
-            background-color: #a00;
-            transition: background-color 0.5s ease;
+        .ok-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .modern-file-input::file-selector-button:hover {
-            background-color: #2980b9;
+        .ok-button:active {
+            transform: translateY(0);
         }
-            
-        .button-container {
-            margin: 12px;
-        }
-            
+
+
         @media(max-width: 767px) {
             wa-carousel {
-            width: 100dvw;
-            height: 100dvh;
+                width: 100dvw;
+                height: 100dvh;
             }
             wa-carousel-item {
-            width: 100%;
-            height: 100%;
+                width: 100%;
+                height: 100%;
             }
             .slide-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: normal;
+                padding: 20px;
+                box-sizing: border-box;
             }
         }`;
 
@@ -127,10 +120,6 @@ export class VooshSendFile extends BaseElement {
     }
 
     render() {
-        const fileClassMap = {
-            "modern-file-input": true,
-            "file-input-error": !!this.errorMessage
-        }
         return html`
         <wa-carousel navigation id="slider" @wa-slide-change=${this.slideChangeEventHandler}>
             ${
@@ -144,7 +133,7 @@ export class VooshSendFile extends BaseElement {
             <wa-carousel-item>
                 <div class="slide-contnent">
                     <h2>Escolha arquivo a upar</h2>
-                    <input type="file" id="send" class="${classMap(fileClassMap)}" @change=${this.onFileChangeEventHandler}
+                    <voosh-file-input id="send" @voosh-change=${this.onFileChangeEventHandler}
                         accept="audio/*,image/*,video/*,application/pdf,application/zip"></input>
                     <p>${this.errorMessage}</p>
                 </div>
@@ -154,8 +143,9 @@ export class VooshSendFile extends BaseElement {
                     <h2>Confirmação</h2>
                     <voosh-file-summarizer .tags=${this.tags} .file=${this.file}></voosh-file-summarizer>
                     <div class="button-container">
-                        <wa-button id="nok" variant="neutral" @click=${this.onClickCancelEventHandler}>Cancelar</wa-button>
-                        <wa-button id="ok" variant="success" @click=${this.onClickOkEventHandler}>OK</wa-button>
+                        <a href="#" @click=${this.onClickCancelEventHandler}>Cancelar</a>
+                        <span>\u00A0</span>
+                        <button id="ok" class="ok-button" @click=${this.onClickOkEventHandler}>OK</button>
                     </div>
                 </div>
             </wa-carousel-item>
@@ -181,8 +171,7 @@ export class VooshSendFile extends BaseElement {
     
     async onFileChangeEventHandler(e: any) {
         console.log("===blargh===");
-        const target = e.target;
-        const files = target.files;
+        const files = e.detail;
         if (files.length === 1 && files[0] && files[0]!.size < 100 * 1024 * 1024) {
             console.log(`files.length = ${files.length}, file name = ${files[0].name}, file size = ${files[0].size}`);
             this.errorMessage = "";
