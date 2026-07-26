@@ -1,0 +1,24 @@
+{
+  "name": "signaling-server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "preview": "node dist/index.js"
+  },
+  "dependencies": {
+    "node-rsa": "^2.0.0",
+    "rotating-file-stream": "^3.2.9",
+    "ts-log": "^3.0.2",
+    "typescript": "^7.0.2",
+    "ws": "^8.21.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/ws": "^8.18.1"
+  }
+}
