@@ -58,7 +58,6 @@ export class VooshSendFile extends BaseElement {
             transform: translateY(0);
         }
 
-
         @media(max-width: 767px) {
             wa-carousel {
                 width: 100dvw;
