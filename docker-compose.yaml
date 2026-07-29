@@ -4,7 +4,8 @@ services:
     build:
       context: ./voosh-file-xfer
     image: voosh-frontend-assets:latest
-    profiles: donotstart
+    profiles: 
+      - donotstart
 
   # 2. Node.js WebSocket Signaling Server
   signaling-server:
