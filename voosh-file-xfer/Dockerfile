@@ -13,4 +13,4 @@ RUN npm run build -- --base=/arx/
 FROM scratch
 COPY --from=builder /app/dist /dist
 
-CMD ["sh", "-c", "tail -f /dev/null"]
+CMD ["bash", "-c", "tail -f /dev/null"]
