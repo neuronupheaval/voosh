@@ -5,7 +5,9 @@ RUN npm ci --only=production
 COPY . .
 EXPOSE 8080
 
+RUN npm run build -- --base=/arx/
+
 FROM builder
-COPY /app/dist /app
+COPY --from=builder /app/dist /app
 
 CMD ["node", "index.js"] 
