@@ -4,6 +4,7 @@ services:
     build:
       context: ./voosh-file-xfer
     image: voosh-frontend-assets:latest
+    scale: 0 # not going to boot up
     container_name: voosh-frontend-builder
     volumes:
       - content:/dist
@@ -24,6 +25,7 @@ services:
     restart: unless-stopped
     depends_on:
       - signaling-server
+      - voosh-frontend-builder
     ports:
       - "80:80"
       - "443:443"
