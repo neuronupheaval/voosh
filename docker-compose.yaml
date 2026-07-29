@@ -7,7 +7,7 @@ services:
     profiles: 
       - manual
     volumes:
-      content:/app/dist
+      - content:/app/dist
 
   # 2. Node.js WebSocket Signaling Server
   signaling-server:
