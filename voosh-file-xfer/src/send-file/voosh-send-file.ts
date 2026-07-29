@@ -130,7 +130,7 @@ export class VooshSendFile extends BaseElement {
                 </div>
             </wa-carousel-item>
             <wa-carousel-item>
-                <div class="slide-contnent">
+                <div class="slide-content">
                     <h2>Escolha arquivo a upar</h2>
                     <voosh-file-input id="send" @voosh-change=${this.onFileChangeEventHandler}
                         accept="audio/*,image/*,video/*,application/pdf,application/zip"></input>
@@ -179,11 +179,11 @@ export class VooshSendFile extends BaseElement {
         } else if (!files[0]) {
             console.log("error while opening file.");
             this.errorMessage = "Erro durante abertura do arquivo!";
-            setTimeout(() => { target.value = '' }, 800);
+            setTimeout(() => { this.errorMessage = '' }, 800);
         } else {
             console.log(`files.length = ${files.length}, file size = ${files[0]?.size}`);
             this.errorMessage = "Arquivo tem que ter menos de 100 megas";
-            setTimeout(() => { target.value = ''; this.file = undefined; }, 800);
+            setTimeout(() => { this.errorMessage = ''; this.file = undefined; }, 800);
         }
     }
 
