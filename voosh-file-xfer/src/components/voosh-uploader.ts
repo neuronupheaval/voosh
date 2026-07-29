@@ -104,7 +104,7 @@ export class VooshUploader extends BaseElement {
     }
 
     async onUpload(ref: string, sender: string) {
-        console.info(`ref = ${ref}, sender = ${sender}`)
+        console.info(`ref = ${ref}, sender = ${sender}`);
 
         this.setTogglingTitle("Consulta de interessado(a) em andamento", 15_000);
         if (ref === await Utility.getRef(this.file)) {
