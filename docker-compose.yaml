@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     depends_on:
       - signaling-server
-      - voosh-frontend-builder
+      - frontend-builder
     ports:
       - "80:80"
       - "443:443"
