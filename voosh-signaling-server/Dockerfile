@@ -5,7 +5,7 @@ RUN npm ci --only=production
 COPY . .
 EXPOSE 8080
 
-RUN npm run build -- --base=/arx/
+RUN npm run build
 
 FROM builder
 COPY --from=builder /app/dist /app
