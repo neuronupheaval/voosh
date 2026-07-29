@@ -1,7 +1,7 @@
 import NodeRSA from 'node-rsa';
 import { WebSocketServer } from 'ws';
 
-const wss = new WebSocketServer({ path: "/ss", port: 8080 });
+const wss = new WebSocketServer({ port: 8080, maxPayload: 10240 });
 const clients = new Map(); // Store active connections by ID
 
 wss.on('connection', (ws, req) => {
