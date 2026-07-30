@@ -10,7 +10,4 @@ COPY .env.production .env
 RUN npm run build -- --base=/arx/
 
 # Stage 2: This will be handled by the main Nginx container
-FROM scratch
-COPY --from=builder /app/dist /dist
-
 CMD ["sleep", "infinity"]
