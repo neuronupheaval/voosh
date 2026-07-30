@@ -7,7 +7,7 @@ COPY . .
 COPY .env.production .env
 
 # Ensure Vite builds with the correct base path for your subdirectory
-RUN npm run build -- --base=/arx/
+RUN npm run build -- --base=/a/
 
 # Stage 2: This will be handled by the main Nginx container
 CMD ["sleep", "infinity"]
