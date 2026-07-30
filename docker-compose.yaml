@@ -4,8 +4,8 @@ services:
     build:
       context: ./voosh-file-xfer
     image: voosh-frontend-assets:latest
-    scale: 0 # not going to boot up
     container_name: voosh-frontend-builder
+    command: sh -c "cp -r /app/dist /dist"
     volumes:
       - content:/dist
 
@@ -24,8 +24,10 @@ services:
     container_name: nginx-proxy
     restart: unless-stopped
     depends_on:
-      - signaling-server
-      - frontend-builder
+      signaling-server:
+        condition: service_started
+      frontend-builder:
+        condition: service_completed_successfully
     ports:
       - "80:80"
       - "443:443"
