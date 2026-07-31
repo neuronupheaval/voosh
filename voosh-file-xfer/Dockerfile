@@ -9,5 +9,9 @@ COPY .env.production .env
 # Ensure Vite builds with the correct base path for your subdirectory
 RUN npm run build -- --base=/a/
 
-FROM scratch
-COPY --from=builder /app/dist /dist
+# Stage 2: Run nginx
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80 443
+
+CMD ["nginx","-g","'daemon off;'"]
