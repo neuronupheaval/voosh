@@ -11,10 +11,21 @@ export default defineConfig({
           next();
         });
       },
+      config(config, { command }) {
+        if (command === "build") {
+          config.base = "/a/";
+          config.build = {
+            ...config.build,
+            cssCodeSplit: false
+          };
+        } else {
+          config.base = "/";
+          config.build = {
+            ...config.build,
+            cssCodeSplit: true
+          };
+        }
+      }
     },
-  ],
-  build: {
-    cssCodeSplit: false
-  },
-  base: command === 'build' ? '/a/' : '/'
+  ]
 });
