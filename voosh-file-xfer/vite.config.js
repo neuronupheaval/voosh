@@ -12,20 +12,29 @@ export default defineConfig({
         });
       },
       config(config, { command }) {
-        if (command === "build") {
-          config.base = "/a/";
-          config.build = {
-            ...config.build,
-            cssCodeSplit: false
+        if (command === "build" || command === "preview") {
+          return {
+            base: "/a/"
           };
         } else {
-          config.base = "/";
-          config.build = {
-            ...config.build,
-            cssCodeSplit: true
+          return {
+            base: "/"
           };
         }
       }
-    },
-  ]
+    }
+  ],
+  optimizeDeps: {
+    include: [
+      '@awesome.me/webawesome'
+    ]
+  },
+  build: {
+    commonjsOptions: {
+      include: [
+        /@awesome\.me\/webawesome/,
+        /node_modules/
+      ]
+    }
+  }
 });
