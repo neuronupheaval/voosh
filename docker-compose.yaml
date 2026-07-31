@@ -5,7 +5,6 @@ services:
       context: ./voosh-file-xfer
     image: voosh-frontend-assets:latest
     container_name: voosh-frontend-builder
-    command: sh -c "cp -r /app/dist /dist"
     volumes:
       - content:/dist
 
