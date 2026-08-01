@@ -195,7 +195,7 @@ export class VooshWebRtcClient {
         };
 
         this.ws.onmessage = async (event) => {
-            console.info(`event.data = ${event.data}`);
+            //console.info(`event.data = ${event.data}`);
             const message = JSON.parse(event.data);
 
             this.removeExpiredP2PResolveTimers();
@@ -282,9 +282,7 @@ export class VooshWebRtcClient {
                         sender: this.myId,
                         target: this.targetId
                     });
-                    console.warn("passei por aqui 101");
                     this.addIceCandidate(new RTCIceCandidate(message.payload));
-                    console.warn("passei por aqui 102");
                     break;
                 }
                 case 'offerToReceiver': {
@@ -381,7 +379,7 @@ export class VooshWebRtcClient {
     }
 
     private sendToSignalingServer(message: any) {
-        console.info(`outbound.payload = ${JSON.stringify(message)}`);
+        //console.info(`outbound.payload = ${JSON.stringify(message)}`);
         this.messageQueueSignalingServer.push(message);
 
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
@@ -474,7 +472,7 @@ export class VooshWebRtcClient {
         this.dataChannel.onclose = () => console.log("p2p channel closed");
         this.dataChannel.onmessage = event => {
             const message = JSON.parse(event.data);
-            console.log(`inbound p2p = ${event.data}`);
+            //console.log(`inbound p2p = ${event.data}`);
 
             // Call handler by type.
             if (message && self.p2pHandlers.has(message.type) && self.p2pHandlers.get(message.type)) {
@@ -553,7 +551,7 @@ export class VooshWebRtcClient {
             self.dataChannel = event.channel;
             self.dataChannel.onmessage = event => {
                 const message = JSON.parse(event.data);
-                console.log(`inbound p2p = ${event.data}`);
+                //console.log(`inbound p2p = ${event.data}`);
 
                 // Call handler by type.
                 if (message && self.p2pHandlers.has(message.type)) {

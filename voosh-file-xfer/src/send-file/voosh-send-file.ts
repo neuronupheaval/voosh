@@ -166,7 +166,7 @@ export class VooshSendFile extends BaseElement {
     }
     
     async onFileChangeEventHandler(e: any) {
-        console.log("===blargh===");
+        //console.log("===blargh===");
         const files = e.detail;
         if (files.length === 1 && files[0] && files[0].size < 100 * 1024 * 1024) {
             console.log(`files.length = ${files.length}, file name = ${files[0].name}, file size = ${files[0].size}`);
