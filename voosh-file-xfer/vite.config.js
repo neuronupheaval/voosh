@@ -24,31 +24,30 @@ export default defineConfig({
       }
     }
   ],
-  optimizeDeps: {
-    include: [
-      '@awesome.me/webawesome'
-    ]
-  },
-  build: {
-    sourcemap: true,
-    commonjsOptions: {
-      include: [
-        /@awesome\.me\/webawesome/,
-        /node_modules/
-      ]
-    },
+  // optimizeDeps: {
+  //   include: [
+  //     '@awesome.me/webawesome'
+  //   ]
+  // },
+  // build: {
+  //   commonjsOptions: {
+  //     include: [
+  //       /@awesome\.me\/webawesome/,
+  //       /node_modules/
+  //     ]
+  //   },
     rollupOptions: {
       treeshake: false,
       // treeshake: {
       //   moduleSideEffects: (id) => id.includes('@awesome.me/webawesome')
       // },
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules/@awesome.me/webawesome')) {
-            return 'v';
-          }
-        }
-      }
+      // output: {
+      //   manualChunks(id) {
+      //     if (id.includes('node_modules/@awesome.me/webawesome')) {
+      //       return 'v';
+      //     }
+      //   }
+      // }
     }
   }
 });
