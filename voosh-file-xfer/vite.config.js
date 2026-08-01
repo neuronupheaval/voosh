@@ -30,6 +30,7 @@ export default defineConfig({
     ]
   },
   build: {
+    sourcemap: true,
     commonjsOptions: {
       include: [
         /@awesome\.me\/webawesome/,
@@ -37,9 +38,10 @@ export default defineConfig({
       ]
     },
     rollupOptions: {
-      treeshake: {
-        moduleSideEffects: (id) => id.includes('@awesome.me/webawesome')
-      },
+      treeshake: false,
+      // treeshake: {
+      //   moduleSideEffects: (id) => id.includes('@awesome.me/webawesome')
+      // },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/@awesome.me/webawesome')) {
