@@ -11,7 +11,8 @@
   "dependencies": {
     "@awesome.me/webawesome": "^3.10.0",
     "lit": "^3.3.3",
-    "node-rsa": "^2.0.0"
+    "node-rsa": "^2.0.0",
+    "terser": "^5.49.0"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
@@ -20,6 +21,10 @@
     "vite": "^8.1.1"
   },
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./src/base/*.?s",
+    "./src/components/*.?s",
+    "./src/receive-file/*.?s",
+    "./src/send-file/*.?s"
   ]
 }

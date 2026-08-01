@@ -57,9 +57,9 @@ export class VooshUploader extends BaseElement {
     }
 
     disconnectedCallback(): void {
-        this.sender!
-            .onUpload(undefined)
-            .offP2PHandler("ack");
+        this.sender
+            ?.onUpload(undefined)
+            ?.offP2PHandler("ack");
         this.sender = undefined;
     }
 

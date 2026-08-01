@@ -1,9 +1,12 @@
+import '@awesome.me/webawesome/dist/webawesome.js';      // registers <wa-*> elements
+import '@awesome.me/webawesome/dist/styles/themes/default.css'; // base theme
+
 import '@awesome.me/webawesome/dist/components/accordion/accordion.js';
 import '@awesome.me/webawesome/dist/components/accordion/accordion.styles.js'
 import '@awesome.me/webawesome/dist/components/accordion-item/accordion-item.js';
 import './send-file/voosh-send-file';
 import './receive-file/voosh-receive-file';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { html } from 'lit/html.js';
 import { BaseElement } from './base/BaseElement';
 import type { WaAccordionExpandEvent } from '@awesome.me/webawesome/dist/events/accordion-expand.js';
@@ -14,26 +17,27 @@ export class App extends BaseElement {
     @property()
     appName = "Voosh-Voosh";
 
-    @property()
-    isUpload: boolean = false;
-    
     @property({ attribute: false})
     sendFile?: File;
-
+    
     @property()
     receiveRef?: string;
+    
+    @state()
+    isUpload: boolean = true;
 
     connectedCallback(): void {
         super.connectedCallback();
-        window.addEventListener('voosh-is-upload', this.onVooshIsUpload);
+        this.addEventListener('voosh-is-upload' as any, this.onVooshIsUpload);
     }
 
     disconnectedCallback(): void {
-        window.removeEventListener('voosh-is-upload', this.onVooshIsUpload);
+        this.removeEventListener('voosh-is-upload' as any, this.onVooshIsUpload);
         super.disconnectedCallback();
     }
     
     render() {
+        console.log(`app.ts this.isUpload = ${this.isUpload}`);
         return html`
         <wa-accordion mode="single-collapsible" @wa-expand=${this.onExpandEventHandler}>
             <wa-accordion-item label="Enviar arquivo &gt;">
@@ -62,8 +66,8 @@ export class App extends BaseElement {
         }
     }
 
-    onVooshIsUpload(e: any) {
-        console.log(`app got voosh-is-upload event: ${e.detail.value}`);
-        this.isUpload = !!e.detail.value;
+    private onVooshIsUpload(e: CustomEvent) {
+        console.log("voosh-app got onVooshIsUpload, e.detail.value = " + e.detail.value);
+        this.isUpload = e.detail.value;
     }
 }

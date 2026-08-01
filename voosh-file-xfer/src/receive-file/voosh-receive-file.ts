@@ -17,10 +17,7 @@ export class VooshReceiveFile extends BaseElement {
     ref?: string;
 
     @property({ type: Boolean })
-    readonly isUpload: boolean = false;
-
-    @property({ type: Boolean })
-    confirm: boolean = false;
+    confirm: boolean = true;
 
     @state()
     table: any[][] = [];
@@ -69,7 +66,7 @@ export class VooshReceiveFile extends BaseElement {
 
     triggerVooshIsUploadEvent() {
         const event = new CustomEvent('voosh-is-upload', {
-            detail: { value: this.isUpload },
+            detail: { value: false /**This is not an upload component*/},
             bubbles: true,
             composed: true
         });

@@ -14,9 +14,6 @@ import { when } from "lit/directives/when.js";
 
 @customElement("voosh-send-file")
 export class VooshSendFile extends BaseElement {
-    @property()
-    readonly isUpload: boolean = true;
-
     @property({ attribute: false, type: Object })
     file?: File;
     
@@ -24,7 +21,7 @@ export class VooshSendFile extends BaseElement {
     tags: string[] = [];
 
     @property({ type: Boolean })
-    confirm: boolean = false;
+    confirm: boolean = true;
 
     @state()
     errorMessage?: string;
@@ -111,7 +108,7 @@ export class VooshSendFile extends BaseElement {
     onExpand() {
         console.log("voosh-send-file got onExpand")
         const event = new CustomEvent('voosh-is-upload', {
-            detail: { value: this.isUpload },
+            detail: { value: true /**This is an upload*/},
             bubbles: true,
             composed: true
         });
@@ -171,7 +168,7 @@ export class VooshSendFile extends BaseElement {
     async onFileChangeEventHandler(e: any) {
         console.log("===blargh===");
         const files = e.detail;
-        if (files.length === 1 && files[0] && files[0]!.size < 100 * 1024 * 1024) {
+        if (files.length === 1 && files[0] && files[0].size < 100 * 1024 * 1024) {
             console.log(`files.length = ${files.length}, file name = ${files[0].name}, file size = ${files[0].size}`);
             this.errorMessage = "";
             this.file = files[0];
