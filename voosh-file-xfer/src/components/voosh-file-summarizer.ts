@@ -15,31 +15,59 @@ export class VooshFileSummarizer extends BaseElement {
     tags: string[] = [];
 
     static override styles?: CSSResultGroup | undefined = css`
-        .ref {
-            font-size: 1.75em;
-            font-family: "Lucida Console", "Courier New", monospace;
+        @media (max-width: 600px) {
+            tr {
+                display: flex;
+                flex-wrap: wrap;
+                margin-bottom: 6px;
+            }
+            tr td:nth-child(2) {
+                flex-grow: 1;
+                flex-shrink: 0;
+                text-align: right;
+            }
+            tr td:nth-child(1) {
+                display: inline-block;
+                font-weight: bold;
+                text-align: left;
+                min-width: 15ch;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 0;
+            }
         }
-        .right {
-            text-align: right;
+
+        @media(min-width: 601px) {
+            .ref {
+                font-size: 1.75em;
+                font-family: "Lucida Console", "Courier New", monospace;
+            }
+            .right {
+                text-align: right;
+            }
+            table, th, td {
+                border: 1px solid var(--wa-color-neutral-300, #ccc);
+                border-collapse: collapse;
+                padding: 8px;
+            }
+            table {
+                width: 100%;
+                min-width: 25wh;
+            }
+            tr td:nth-child(even) {
+                text-align: right;
+            }
+            tr.highlight {
+                background-color: #ccc;
+            }
         }
-        table, th, td {
-            border: 1px solid var(--wa-color-neutral-300, #ccc);
-            border-collapse: collapse;
-            padding: 8px;
-        }
-        table {
-            width: 100%;
-            min-width: 25wh;
-        }
-        tr td:nth-child(even) {
-            text-align: right;
-        }
-        tr.highlight {
-            background-color: #ccc;
-        }`;
+`;
 
     render() {
         return html`
+        <div class="table-container">
             <table class="wa-zebra-rows wa-hover-rows wa-tabular-nums" width="100%">
                 <tbody>
                     <tr>
@@ -63,7 +91,8 @@ export class VooshFileSummarizer extends BaseElement {
                         </td>
                     </tr>
                 </tbody>
-            </table>`;
+            </table>
+        </div>`;
     }
 
     humanSize(sizeInBytes?: number) {

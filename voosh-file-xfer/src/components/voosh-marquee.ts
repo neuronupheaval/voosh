@@ -55,7 +55,7 @@ export class CustomMarquee extends LitElement {
     render() {
         return html`
           <div class="marquee-container">
-              ${ this.whatIsShown ? html`<label>Escolhido:\u00A0</label>` : html``}<span class="text-content">${this.whatIsShown}</span>
+              <span class="text-content">${this.whatIsShown}</span>
           </div>
         `;
     }
