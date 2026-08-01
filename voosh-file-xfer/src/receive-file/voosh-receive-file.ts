@@ -7,7 +7,6 @@ import { BaseElement } from "../base/BaseElement";
 import { css, CSSResultGroup, html, type TemplateResult } from "lit";
 import { type RefMatchedResponse, VooshWebRtcClient } from "../components/voosh-webrtc-client";
 import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
-import streamSaver from "streamsaver";
 import { when } from "lit/directives/when.js";
 import { repeat } from "lit/directives/repeat.js";
 import type WaButton from "@awesome.me/webawesome/dist/components/button/button.js"; 
