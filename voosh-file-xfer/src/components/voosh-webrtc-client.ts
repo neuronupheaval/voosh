@@ -498,7 +498,22 @@ export class VooshWebRtcClient {
             const status = this.peerConnection!.iceConnectionState;
             
             if (status === "disconnected") {
-                console.log("Network temporarily disrupted, waiting for recovery...");
+                let timeout = 500;
+                let timer!: ReturnType<typeof setTimeout>;
+                (function reconnect() {
+                    console.log("Network temporarily disrupted, attempting recovery...");
+                    setTimeout(() => {
+                        if (self.peerConnection!.iceConnectionState === "disconnected" ||
+                            self.peerConnection!.iceConnectionState === "failed") {
+                            console.log("Reconnecting to P2P friend...");
+                            self.peerConnection!.restartIce();
+                            reconnect();
+                        } else {
+                            clearTimeout(timer);
+                            console.log("Connection recovered.");
+                        }
+                    }, Math.min(timeout *= 2, 60_000));
+                })();
             }
             
             if (status === "failed") {
