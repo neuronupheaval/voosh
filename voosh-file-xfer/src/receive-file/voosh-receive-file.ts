@@ -165,13 +165,11 @@ export class VooshReceiveFile extends BaseElement {
         anchor.remove();
     }
 
-    onRefInputKeyUp(e: KeyboardEvent) {
-        const key = e.key || e.code;
-        const value = (e.target as WaInput).value?.trim();
-        if ((key === "Space" || key === " " || key === "Enter") && value) {
-            this.ref = value;
-
-            console.log(`pressed magic key with ref [${value}]`);
+    onRefInput(e: InputEvent) {
+        const value = (e.target as HTMLInputElement).value;
+        if (value && value.trim().length > 0 && value.endsWith(' ')) {
+            this.ref = value.trim();
+            console.log(`user has stroke magic key with ref [${this.ref}]`);
             // Initialize state machine.
             this.onInit();
             console.log("onInit has finished");
@@ -207,7 +205,7 @@ export class VooshReceiveFile extends BaseElement {
 
         return when(this.confirm, 
             () => html`<wa-input label="Digite Ref"
-            appearance="filled-outlined" size="m" pill maxlength="8" @keyup=${this.onRefInputKeyUp}></wa-input>
+            appearance="filled-outlined" size="m" pill maxlength="8" @input=${this.onRefInput}></wa-input>
             <div>&nbsp;</div>
             <table class="wa-zebra-rows wa-hover-rows wa-tabular-nums" width="100%">
         ${this.count.value > 0 ? repeat(
