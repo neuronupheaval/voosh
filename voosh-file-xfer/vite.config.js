@@ -35,19 +35,19 @@ export default defineConfig({
   //       /@awesome\.me\/webawesome/,
   //       /node_modules/
   //     ]
-  //   },
-    rollupOptions: {
-      treeshake: false,
-      // treeshake: {
-      //   moduleSideEffects: (id) => id.includes('@awesome.me/webawesome')
-      // },
-      // output: {
-      //   manualChunks(id) {
-      //     if (id.includes('node_modules/@awesome.me/webawesome')) {
-      //       return 'v';
-      //     }
-      //   }
-      // }
-    }
+  //   }
+  // },
+  rollupOptions: {
+    treeshake: false,
+    // treeshake: {
+    //   moduleSideEffects: (id) => id.includes('@awesome.me/webawesome')
+    // },
+    // output: {
+    //   manualChunks(id) {
+    //     if (id.includes('node_modules/@awesome.me/webawesome')) {
+    //       return 'v';
+    //     }
+    //   }
+    // }
   }
 });
