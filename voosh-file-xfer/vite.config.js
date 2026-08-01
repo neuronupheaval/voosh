@@ -24,19 +24,19 @@ export default defineConfig({
       }
     }
   ],
-  // optimizeDeps: {
-  //   include: [
-  //     '@awesome.me/webawesome'
-  //   ]
-  // },
-  // build: {
-  //   commonjsOptions: {
-  //     include: [
-  //       /@awesome\.me\/webawesome/,
-  //       /node_modules/
-  //     ]
-  //   }
-  // },
+  optimizeDeps: {
+    include: [
+      '@awesome.me/webawesome'
+    ]
+  },
+  build: {
+    commonjsOptions: {
+      include: [
+        /@awesome\.me\/webawesome/,
+        /node_modules/
+      ]
+    }
+  },
   rollupOptions: {
     treeshake: false,
     // treeshake: {
