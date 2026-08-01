@@ -4,6 +4,9 @@ export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/a/' : '/',
   build: {
     target: 'es2022',
-    sourcemap: mode !== 'production'
+    sourcemap: mode !== 'production',
+    esbuild: {
+      drop: mode === 'production' ? ['console', 'debugger'] : []
+    }
   }
 }));
