@@ -14,13 +14,13 @@ import type WaButton from "@awesome.me/webawesome/dist/components/button/button.
 
 @customElement("voosh-receive-file")
 export class VooshReceiveFile extends BaseElement {
-    @property()
+    @property({ type: String })
     ref?: string;
 
-    @property()
+    @property({ type: Boolean })
     readonly isUpload: boolean = false;
 
-    @property()
+    @property({ type: Boolean })
     confirm: boolean = false;
 
     @state()

@@ -37,10 +37,10 @@ export class App extends BaseElement {
         return html`
         <wa-accordion mode="single-collapsible" @wa-expand=${this.onExpandEventHandler}>
             <wa-accordion-item label="Enviar arquivo &gt;">
-                <voosh-send-file id="send" .confirm=${this.isUpload}></voosh-send-file>
+                <voosh-send-file id="send" ?confirm=${this.isUpload}></voosh-send-file>
             </wa-accordion-item>
             <wa-accordion-item label="&lt; Receber arquivo">
-                <voosh-receive-file id="receive" .confirm=${!this.isUpload}></voosh-receive-file>
+                <voosh-receive-file id="receive" ?confirm=${!this.isUpload}></voosh-receive-file>
             </wa-accordion-item>
         </wa-accordion>`;
     }

@@ -20,10 +20,10 @@ export class VooshSendFile extends BaseElement {
     @property({ attribute: false, type: Object })
     file?: File;
     
-    @property()
+    @property({ type: Array })
     tags: string[] = [];
 
-    @property()
+    @property({ type: Boolean })
     confirm: boolean = false;
 
     @state()
