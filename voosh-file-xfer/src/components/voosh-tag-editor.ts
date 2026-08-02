@@ -1,8 +1,9 @@
+import "@awesome.me/webawesome/dist/components/input/input.js";
 import "@awesome.me/webawesome/dist/components/tag/tag.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { BaseElement } from "../base/BaseElement";
+import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
 import type WaTag from "@awesome.me/webawesome/dist/components/tag/tag.js";
-import type { WaInput } from "@awesome.me/webawesome/dist/ssr/all.js";
 import { repeat } from "lit/directives/repeat.js";
 import { html } from "lit";
 
@@ -15,7 +16,8 @@ export class VooshTagEditor extends BaseElement {
     content?: string = "";
 
     render() {
-        return html`<wa-input id="editor" appearance="filled-outlined" placeholder="ex: fotos praia setembro 2026" @input=${this.inputEventHandler} ?disabled=${this.tags.length >= 7}></wa-input>
+        return html`<wa-input id="editor" label="Explique o arquivo" appearance="filled-outlined" size="m" pill
+            placeholder="ex: fotos praia setembro 2026" @input=${this.inputEventHandler} ?disabled=${this.tags.length >= 7}></wa-input>
         <p id="bag">${
         repeat(
             this.tags,
@@ -36,8 +38,8 @@ export class VooshTagEditor extends BaseElement {
         const tagElement = e.target as WaTag;
         const removingIndex = this.tags.indexOf(tagElement.textContent.trim());
         if (removingIndex >= 0) {
-            tagElement.style.opacity = '0';
             tagElement.style.transition = 'opacity 0.4s ease';
+            tagElement.style.opacity = '0';
             setTimeout(() => {
                 this.resetTagContentTextBox();
                 this.tags = this.tags.filter((_, index) => index !== removingIndex);

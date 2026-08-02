@@ -28,6 +28,12 @@ export class VooshSendFile extends BaseElement {
 
     @state()
     ref?: string;
+
+    @state()
+    private hasAnyUserActivity: Boolean | null = null;
+    private noActivityTimer?: ReturnType<typeof setInterval>;
+
+    @query('#explanation') private readonly explanation!: HTMLParagraphElement | null;
     
     static override styles?: CSSResultGroup | undefined = css`
         wa-carousel-item {
@@ -53,6 +59,13 @@ export class VooshSendFile extends BaseElement {
 
         .ok-button:active {
             transform: translateY(0);
+        }
+
+        #explanation {
+            padding: 20px;
+            border: 6px dashed #ccc;
+            border-radius: 20px;
+            opacity: 0;
         }
 
         @media(max-width: 767px) {
@@ -84,6 +97,24 @@ export class VooshSendFile extends BaseElement {
         }
     }
 
+    protected updated(_changedProperties: PropertyValues): void {
+        console.log("passei 3");
+        if (_changedProperties.has("confirm") && this.confirm) {
+            console.log("passei 1");
+            document.body.addEventListener('click', this.onReactToDocument(this.explanation));
+            document.body.addEventListener('keyup', this.onReactToDocument(this.explanation));
+        } else if (_changedProperties.has("confirm") && !this.confirm) {
+            console.log("passei 2");
+            document.body.removeEventListener('keyup', this.onReactToDocument(this.explanation));
+            document.body.removeEventListener('click', this.onReactToDocument(this.explanation));
+        }
+    }
+
+    disconnectedCallback(): void {
+        clearInterval(this.noActivityTimer);
+        super.disconnectedCallback();
+    }
+
     private slideChangeEventHandler(event: CustomEvent) {
         // 1. Get the index of the newly active slide from Web Awesome's event detail
         const activeIndex = event.detail.index;
@@ -103,6 +134,8 @@ export class VooshSendFile extends BaseElement {
                 queue = [...queue, ...queueHead.children];
             }
         }
+
+        this.clearExplanation();
     }
 
     onExpand() {
@@ -112,18 +145,23 @@ export class VooshSendFile extends BaseElement {
             bubbles: true,
             composed: true
         });
-        this.dispatchEvent(event);    
+        this.dispatchEvent(event);
+        
+        if (!this.noActivityTimer) {
+            this.onFirstCarouselItemLoad();
+        }
     }
 
     render() {
         return html`
-        <wa-carousel navigation id="slider" @wa-slide-change=${this.slideChangeEventHandler}>
+        <wa-carousel id="slider" @wa-slide-change=${this.slideChangeEventHandler}>
             ${
                 when(this.confirm, () => 
             html`<wa-carousel-item>
-                <div class="slide-content">
+                <div id="first-landing-slide" class="slide-content">
                     <h2>Informe as tags</h2>
                     <voosh-tag-editor .tags=${this.tags} @voosh-change=${this.onTagsChangeEventHandler}></voosh-tag-editor>
+                    <p id="explanation">&nbsp;</p>
                 </div>
             </wa-carousel-item>
             <wa-carousel-item>
@@ -155,6 +193,47 @@ export class VooshSendFile extends BaseElement {
         </wa-carousel>`;
     }
 
+    onFirstCarouselItemLoad() {
+        console.log("passei 4");
+        this.noActivityTimer = setInterval(() => {
+            if (this.confirm) {
+                if (this.hasAnyUserActivity !== false) {
+                    this.hasAnyUserActivity = false;
+                } else if (this.hasAnyUserActivity === false) {
+                    const hasTouchScreen = window.matchMedia("(pointer: coarse)").matches;
+                    const explanationElement = (this.shadowRoot || this).querySelector('#explanation')! as HTMLParagraphElement;
+                    explanationElement.innerText = "Explique o assunto do arquivo, acima, como o exemplo. Depois,";
+                    explanationElement.innerText += hasTouchScreen
+                        ? "\u00a0arraste o dedo na tela para prosseguir."
+                        : "\u00a0use a tecla \u2192 do teclado para prosseguir.";
+                    explanationElement.style.transition = 'opacity 1.1s ease';
+                    explanationElement.style.opacity = '0.7';
+                }
+            }
+        }, 5_000);
+    }
+
+    onReactToDocument(explanation: HTMLParagraphElement | null) {
+        this.hasAnyUserActivity = true;
+        return function() {
+            if (explanation) {
+                explanation.style.transition = 'opacity 0.4s ease';
+                explanation.style.opacity = '0';
+                setTimeout(() => explanation.innerText = '', 400);
+            } else {
+                console.log('explanation is null');
+            }
+        }.bind(this);
+    }
+
+    clearExplanation() {
+        clearInterval(this.noActivityTimer);
+        const explanationElement = this.explanation!;
+        explanationElement.style.transition = 'opacity 0.4s ease';
+        explanationElement.style.opacity = '0';
+        setTimeout(() => explanationElement.textContent = '', 400);
+    }
+
     onClickOkEventHandler() {
         const sliderElement = this.shadowRoot!.getElementById("slider")! as WaCarousel;
         sliderElement.next();
@@ -166,7 +245,6 @@ export class VooshSendFile extends BaseElement {
     }
     
     async onFileChangeEventHandler(e: any) {
-        //console.log("===blargh===");
         const files = e.detail;
         if (files.length === 1 && files[0] && files[0].size < 100 * 1024 * 1024) {
             console.log(`files.length = ${files.length}, file name = ${files[0].name}, file size = ${files[0].size}`);
@@ -179,7 +257,7 @@ export class VooshSendFile extends BaseElement {
             setTimeout(() => { this.errorMessage = '' }, 800);
         } else {
             console.log(`files.length = ${files.length}, file size = ${files[0]?.size}`);
-            this.errorMessage = "Arquivo tem que ter menos de 100 megas";
+            this.errorMessage = "O arquivo tem que ter menos de 100 megas";
             setTimeout(() => { this.errorMessage = ''; this.file = undefined; }, 800);
         }
     }

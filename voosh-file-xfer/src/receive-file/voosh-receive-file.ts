@@ -1,9 +1,9 @@
 import "@awesome.me/webawesome/dist/components/input/input.js";
 import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
 import "@awesome.me/webawesome/dist/components/button/button.js";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 import { BaseElement } from "../base/BaseElement";
-import { css, CSSResultGroup, html, nothing } from "lit";
+import { css, CSSResultGroup, html, nothing, PropertyValues } from "lit";
 import { type RefMatchedResponse, VooshWebRtcClient } from "../components/voosh-webrtc-client";
 import { when } from "lit/directives/when.js";
 import { repeat } from "lit/directives/repeat.js";
@@ -36,6 +36,13 @@ export class VooshReceiveFile extends BaseElement {
     @state()
     private statusMessage = "";
 
+    @state()
+    private hasAnyUserActivity: Boolean | null = null;
+    private noActivityTimer?: ReturnType<typeof setInterval>;
+
+    @query('#explanation')
+    private readonly explanation!: HTMLParagraphElement | null;
+
     private fileName?: { value: string; };
     private fileSize?: { value: number };
     private readonly chunkSize = 1_024;
@@ -45,7 +52,7 @@ export class VooshReceiveFile extends BaseElement {
     private chunkCount = 0;
     
     private shouldUpdateUI = { value: false };
-    
+
     static override styles?: CSSResultGroup | undefined = css`
         .ref {
             font-size: 1.75em;
@@ -62,11 +69,51 @@ export class VooshReceiveFile extends BaseElement {
         .dl-icon {
             width: 3.9em;
             aspect-ratio: 16/9;
+        }   
+        #explanation {
+            padding: 20px;
+            border: 6px dashed #ccc;
+            border-radius: 20px;
+            opacity: 0;
         }`;
+
+    disconnectedCallback(): void {
+        clearInterval(this.noActivityTimer);
+        super.disconnectedCallback();
+    }
+
+    protected updated(_changedProperties: PropertyValues): void {
+        if (_changedProperties.has("confirm") && this.confirm) {
+            console.log("passei 1");
+            document.body.addEventListener('click', this.onReactToDocument(this.explanation));
+            document.body.addEventListener('keyup', this.onReactToDocument(this.explanation));
+        } else if (_changedProperties.has("confirm") && !this.confirm) {
+            console.log("passei 2");
+            document.body.removeEventListener('keyup', this.onReactToDocument(this.explanation));
+            document.body.removeEventListener('click', this.onReactToDocument(this.explanation));
+        }
+    }
 
     onExpand() {
         console.log("voosh-receive-file got onExpand");
         this.triggerVooshIsUploadEvent();
+
+        if (!this.noActivityTimer) {
+            this.onFirstTimeExpansion();
+        }
+    }
+
+    onReactToDocument(explanation: HTMLParagraphElement | null) {
+        this.hasAnyUserActivity = true;
+        return function() {
+            if (explanation) {
+                explanation.style.transition = 'opacity 0.4s ease';
+                explanation.style.opacity = '0';
+                setTimeout(() => explanation.innerText = '', 400);
+            } else {
+                console.log('explanation is null');
+            }
+        }.bind(this);
     }
 
     triggerVooshIsUploadEvent() {
@@ -78,9 +125,34 @@ export class VooshReceiveFile extends BaseElement {
         this.dispatchEvent(event);
     }
 
+    onFirstTimeExpansion() {
+        this.noActivityTimer = setInterval(() => {
+            if (this.confirm) {
+                if (this.hasAnyUserActivity !== false) {
+                    this.hasAnyUserActivity = false;
+                } else if (this.hasAnyUserActivity === false) {
+                    const explanationElement = this.explanation!;
+                    explanationElement.innerText = 'Cole ou digite a Ref na caixa acima. A Ref é fornecida pela pessoa que enviará o arquivo. Depois disso, aperte Barra de Espaços.';
+                    explanationElement.style.transition = 'opacity 1.1s ease';
+                    explanationElement.style.opacity = '0.7';
+                }
+            }
+        }, 5_000);
+    }
+
+    clearExplanation() {
+        clearInterval(this.noActivityTimer);
+        const explanationElement = this.explanation!;
+        explanationElement.style.transition = 'opacity 0.4s ease';
+        explanationElement.style.opacity = '0';
+        setTimeout(() => explanationElement.textContent = '', 400);
+    }
+
     onDownloadCandidate(context: { download(): void }, details: RefMatchedResponse) {
         console.log("populating table");
-
+        if (this.noActivityTimer) {
+            this.clearExplanation();
+        }
         const countClone = structuredClone(this.count);
         this.table = [ ...this.table,
             [ html`${++countClone.value}`,
@@ -210,7 +282,7 @@ export class VooshReceiveFile extends BaseElement {
         return when(this.confirm, 
             () => html`<wa-input label="Digite Ref"
             appearance="filled-outlined" size="m" pill maxlength="8" @input=${this.onRefInput}></wa-input>
-            <div>&nbsp;</div>
+            <p id="explanation"></p>
             <table class="wa-zebra-rows wa-hover-rows wa-tabular-nums" width="100%">
         ${this.count.value > 0 ? repeat(
             [ thead, ...this.table ],

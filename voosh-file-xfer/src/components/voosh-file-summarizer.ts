@@ -30,7 +30,6 @@ export class VooshFileSummarizer extends BaseElement {
             }
             tr td:nth-child(2) {
                 flex-grow: 1;
-                flex-shrink: 0;
                 text-align: right;
                 padding: 1.0em 0;
             }
@@ -65,6 +64,9 @@ export class VooshFileSummarizer extends BaseElement {
                 background-color: #ccc;
             }
         }
+
+        p#tagBag {
+        }
 `;
 
     render() {
@@ -85,7 +87,7 @@ export class VooshFileSummarizer extends BaseElement {
                         <td><p id="tagBag">${when(this.tags.length === 0, 
                             () => html`<span class="wa-color-neutral-500">n/a</span>`, 
                             () => html`${this.tags.map(tag => html`<wa-tag appearance="filled-outlined">${tag}</wa-tag>`)}`)
-                        }</td>
+                        }</p></td>
                     </tr>
                     <tr class="highlight">
                         <td>Ref</td>
