@@ -71,7 +71,7 @@ export class VooshWebRtcClient {
     private readonly p2pResolverTimers: Map<string, number>;
 
     private cannotUploadFurther = false;
-    private readonly basicTimeoutForP2PInMs = 2_8q00; // Possible values: 0.2x, 1x, 2x, 17x.
+    private readonly basicTimeoutForP2PInMs = 2_800; // Possible values: 0.2x, 1x, 2x, 17x.
 
     constructor(signalingServerUrlDeferred: () => string) {
         if (signalingServerUrlDeferred) {
