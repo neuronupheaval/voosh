@@ -43,7 +43,7 @@ export class VooshWebRtcClient {
     private peerConnection?: RTCPeerConnection;
     private dataChannel?: RTCDataChannel;
     private myId?: string;
-    private r?: string;
+    private s?: string;
     private targetId?: string; // Set this to the other peer's ID to connect
     private setup?: RTCConfiguration;
     private readonly messageQueueSignalingServer: any[];
@@ -69,6 +69,9 @@ export class VooshWebRtcClient {
 
     private readonly p2pResolvers: Map<string, { resolve(): void }>;
     private readonly p2pResolverTimers: Map<string, number>;
+
+    private cannotUploadFurther = false;
+    private readonly basicTimeoutForP2PInMs = 2_8q00; // Possible values: 0.2x, 1x, 2x, 17x.
 
     constructor(signalingServerUrlDeferred: () => string) {
         if (signalingServerUrlDeferred) {
@@ -98,7 +101,7 @@ export class VooshWebRtcClient {
                 this.pongTimeoutTimer = setTimeout(() => {
                     console.warn("Signaling server heartbeat timed out. Severing link.");
                     this.ws.close();
-                }, 5000);
+                }, this.basicTimeoutForP2PInMs);
             }
         }, this.pingIntervalMs);
     }
@@ -209,7 +212,7 @@ export class VooshWebRtcClient {
 
                 case 'welcome':
                     this.myId = this.myId || message.id;
-                    this.r = message.r;
+                    this.s = message.r;
                     this.sendToSignalingServer({
                         type: 'welcomeAck',
                         sender: message.id,
@@ -219,7 +222,7 @@ export class VooshWebRtcClient {
                     break;
 
                 case 'setup':
-                    const rsa = new NodeRSA(this.r!);
+                    const rsa = new NodeRSA(this.s!);
                     const originalPayload = rsa.decryptPublic(message.payload, 'utf8');
                     this.setup = JSON.parse(originalPayload) as RTCConfiguration;
                     console.log(`Setup message received`);
@@ -268,10 +271,15 @@ export class VooshWebRtcClient {
                     break;
 
                 case 'dl':
-                    // Start P2P receiver.
-                    this.targetId = message.sender;
-                    console.log(`i've found somebody to give the file to: id [${this.targetId}]`);
-                    await this.createSenderP2PConnection();
+                    if (this.cannotUploadFurther) {
+                        console.log(`cannot upload further, ignoring dl message from [${message.sender}]`);
+                    } else {
+                        this.cannotUploadFurther = true;
+                        // Start P2P receiver.
+                        this.targetId = message.sender;
+                        console.log(`i've found somebody to give the file to: id [${this.targetId}]`);
+                        await this.createSenderP2PConnection();
+                    }
                     break;
                     
                 // Related to the WebRTC syncing mechanism.
@@ -303,7 +311,7 @@ export class VooshWebRtcClient {
                         const answer = await this.peerConnection!.createAnswer();
                         await this.gotReceiverP2PDescription(this.peerConnection!, answer);
                         console.log("signaling server received sender description message");
-                    }, 100);
+                    }, this.basicTimeoutForP2PInMs);
                     break;
                 }
                 case 'answerToSender': {
@@ -321,7 +329,7 @@ export class VooshWebRtcClient {
                         });
                         this.isRemoteDescriptionSet = true;
                         this.flushIceCandidateQueue();
-                    }, 100);
+                    }, this.basicTimeoutForP2PInMs);
                     break;
                 }
                 default:
@@ -496,8 +504,7 @@ export class VooshWebRtcClient {
             const status = this.peerConnection!.iceConnectionState;
             
             if (status === "disconnected") {
-                let timeout = 500;
-                let timer!: ReturnType<typeof setTimeout>;
+                let timeout = self.basicTimeoutForP2PInMs / 10.0;
                 (function reconnect() {
                     console.log("Network temporarily disrupted, attempting recovery...");
                     setTimeout(() => {
@@ -507,10 +514,9 @@ export class VooshWebRtcClient {
                             self.peerConnection!.restartIce();
                             reconnect();
                         } else {
-                            clearTimeout(timer);
-                            console.log("Connection recovered.");
+                            console.log(`Connection recovered, state ${self.peerConnection!.iceConnectionState}`);
                         }
-                    }, Math.min(timeout *= 2, 60_000));
+                    }, Math.min(timeout <<= 1, 17.0 * self.basicTimeoutForP2PInMs));
                 })();
             }
             
@@ -628,12 +634,12 @@ export class VooshWebRtcClient {
     private async gotSenderP2PDescription(peerConnection: RTCPeerConnection, offer: RTCSessionDescriptionInit) {
         console.log("got offer (produced by sender)");
         await peerConnection.setLocalDescription(offer);
-        setTimeout(async () => await this.fire("offerToReceiver", offer), 200);
+        setTimeout(async () => await this.fire("offerToReceiver", offer), this.basicTimeoutForP2PInMs);
     }
     
     private async gotReceiverP2PDescription(peerConnection: RTCPeerConnection, answer: RTCSessionDescriptionInit) {
         console.log("got answer (produced by receiver)");
         await peerConnection.setLocalDescription(answer);
-        setTimeout(async () => await this.fire("answerToSender", answer), 200);
+        setTimeout(async () => await this.fire("answerToSender", answer), this.basicTimeoutForP2PInMs);
     }
 }

@@ -1,12 +1,10 @@
 import "@awesome.me/webawesome/dist/components/input/input.js";
 import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
 import "@awesome.me/webawesome/dist/components/button/button.js";
-import "@awesome.me/webawesome/dist/components/icon/icon.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { BaseElement } from "../base/BaseElement";
-import { css, CSSResultGroup, html, type TemplateResult } from "lit";
+import { css, CSSResultGroup, html, nothing } from "lit";
 import { type RefMatchedResponse, VooshWebRtcClient } from "../components/voosh-webrtc-client";
-import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
 import { when } from "lit/directives/when.js";
 import { repeat } from "lit/directives/repeat.js";
 import type WaButton from "@awesome.me/webawesome/dist/components/button/button.js"; 
@@ -34,7 +32,10 @@ export class VooshReceiveFile extends BaseElement {
     
     @state()
     private fileOffset = 0;
-    
+
+    @state()
+    private statusMessage = "";
+
     private fileName?: { value: string; };
     private fileSize?: { value: number };
     private readonly chunkSize = 1_024;
@@ -57,6 +58,10 @@ export class VooshReceiveFile extends BaseElement {
         td {
             text-align: right;
             padding: 12px;
+        }
+        .dl-icon {
+            width: 3.9em;
+            aspect-ratio: 16/9;
         }`;
 
     onExpand() {
@@ -77,29 +82,31 @@ export class VooshReceiveFile extends BaseElement {
         console.log("populating table");
 
         const countClone = structuredClone(this.count);
-        const self = this;
         this.table = [ ...this.table,
             [ html`${++countClone.value}`,
                 html`${details.fileName}`,
                 html`${Intl.NumberFormat(undefined, {maximumFractionDigits:0}).format(details.fileSize)}`,
                 html`${details.tags?.join(", ")}`,
-                html`<wa-button size="s" @click=${(e: MouseEvent) => {
-                    (e.target as WaButton).disabled = true;
-                    self.fileName = { value: details.fileName };
-                    self.fileSize = { value: details.fileSize };
+                html`<wa-button size="s" pill appearance="accent" variant="neutral" @click=${(e: MouseEvent) => {
+                    this.statusMessage = 'O download começa em breve';
+                    const button = e.target as WaButton;
+                    button.disabled = true;
+                    button.style.opacity = '0.4';
+                    this.fileName = { value: details.fileName };
+                    this.fileSize = { value: details.fileSize };
                     const trs = this.shadowRoot!.querySelectorAll(`tr:has(td:nth-child(6):not([voosh-sender='${details.sender}']))`);
                     for (let i = 0; i < trs.length; ++i) {
-                        const tr = (trs[i] as HTMLTableRowElement)
+                        const tr = trs[i] as HTMLTableRowElement;
                         tr.style.transition = "opacity 0.8s ease";
                         tr.style.opacity = "0";
                         setTimeout(() => tr.remove(), 800);
                     }
                     context.download();
-                }}><wa-icon name="arrow-down" style="font-size: 1rem; color: mediumseagreen;"></button>`,
+                }}><img class="dl-icon" src="img/dl-icon.svg"></img></wa-button>`,
                 details.sender
             ]
         // Remove duplicates
-        ].filter((row, index, self) => self.findIndex(r => r[5] == row[5]) === index);
+        ].filter((row, index, self) => self.findIndex(r => r[5] === row[5]) === index);
 
         this.count = countClone;
         this.shouldUpdateUI.value = true;
@@ -199,10 +206,7 @@ export class VooshReceiveFile extends BaseElement {
 
     render() {
         const thead = [ html`número`, html`nome do arquivo`, html`tamanho`, html`tags`, html`&nbsp;` ];
-        const percent = Math.ceil(this.fileOffset / (this.fileSize?.value ?? 1.000) * 100.000);
-
-        console.log(`render  this.count.value = ${this.count.value}`);
-
+        const percent = Math.ceil(this.fileOffset / (this.fileSize?.value ?? 1.000) * 100.000)
         return when(this.confirm, 
             () => html`<wa-input label="Digite Ref"
             appearance="filled-outlined" size="m" pill maxlength="8" @input=${this.onRefInput}></wa-input>
@@ -226,7 +230,7 @@ export class VooshReceiveFile extends BaseElement {
         <div>&nbsp;</div>
         ${
             percent == 0
-            ? html``
+            ? this.statusMessage
             : html`<wa-progress-bar id="progress-bar" .value=${percent}>
                 ${percent >= 100.0 ? html`finalizado` : html`${percent}%`}
                 </wa-progress-bar>`
