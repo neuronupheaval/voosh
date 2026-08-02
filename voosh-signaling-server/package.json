@@ -12,8 +12,6 @@
   },
   "dependencies": {
     "node-rsa": "^2.0.0",
-    "rotating-file-stream": "^3.2.9",
-    "ts-log": "^3.0.2",
     "typescript": "^7.0.2",
     "ws": "^8.21.1"
   },
