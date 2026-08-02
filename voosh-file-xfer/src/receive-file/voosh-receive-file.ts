@@ -87,11 +87,11 @@ export class VooshReceiveFile extends BaseElement {
                 html`${details.fileName}`,
                 html`${Intl.NumberFormat(undefined, {maximumFractionDigits:0}).format(details.fileSize)}`,
                 html`${details.tags?.join(", ")}`,
-                html`<wa-button size="s" pill appearance="accent" variant="neutral" @click=${(e: MouseEvent) => {
+                html`<wa-button size="s" pill appearance="accent" variant="brand" @click=${(e: MouseEvent) => {
                     this.statusMessage = 'O download começa em breve';
                     const button = e.target as WaButton;
                     button.disabled = true;
-                    button.style.opacity = '0.4';
+                    button.style.opacity = '0.1';
                     this.fileName = { value: details.fileName };
                     this.fileSize = { value: details.fileSize };
                     const trs = this.shadowRoot!.querySelectorAll(`tr:has(td:nth-child(6):not([voosh-sender='${details.sender}']))`);
