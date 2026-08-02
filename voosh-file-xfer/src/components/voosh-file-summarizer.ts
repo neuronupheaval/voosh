@@ -5,6 +5,7 @@ import { BaseElement } from "../base/BaseElement";
 import { css, html, type CSSResultGroup } from "lit";
 import { Utility } from "../base/Utility";
 import { until } from "lit/directives/until.js";
+import { when } from 'lit/directives/when.js';
 
 @customElement("voosh-file-summarizer")
 export class VooshFileSummarizer extends BaseElement {
@@ -19,18 +20,19 @@ export class VooshFileSummarizer extends BaseElement {
             tr {
                 display: flex;
                 flex-wrap: wrap;
-                margin-bottom: 6px;
-            }
-            tr td:nth-child(2) {
-                flex-grow: 1;
-                flex-shrink: 0;
-                text-align: right;
+                border-bottom: 1px solid var(--wa-color-neutral-300, #ccc);
             }
             tr td:nth-child(1) {
                 display: inline-block;
                 font-weight: bold;
                 text-align: left;
                 min-width: 15ch;
+            }
+            tr td:nth-child(2) {
+                flex-grow: 1;
+                flex-shrink: 0;
+                text-align: right;
+                padding: 1.0em 0;
             }
             table {
                 width: 100%;
@@ -80,8 +82,9 @@ export class VooshFileSummarizer extends BaseElement {
                     </tr>
                     <tr>
                         <td>Tags</td>
-                        <td><p id="tagBag">${
-                            this.tags.map(tag => html`<wa-tag appearance="filled-outlined">${tag}</wa-tag>`)
+                        <td><p id="tagBag">${when(this.tags.length === 0, 
+                            () => html`<span class="wa-color-neutral-500">n/a</span>`, 
+                            () => html`${this.tags.map(tag => html`<wa-tag appearance="filled-outlined">${tag}</wa-tag>`)}`)
                         }</td>
                     </tr>
                     <tr class="highlight">
