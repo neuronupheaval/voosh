@@ -7,7 +7,7 @@ COPY . .
 COPY .env.production .env
 
 # Ensure Vite builds with the correct base path for your subdirectory
-RUN npm run build -- --mode=production
+RUN npm run build
 
 # Stage 2: Run nginx
 FROM nginx:alpine
