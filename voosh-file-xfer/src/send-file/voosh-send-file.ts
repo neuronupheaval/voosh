@@ -31,7 +31,7 @@ export class VooshSendFile extends BaseElement {
 
     @state()
     private hasAnyUserActivity: Boolean | null = null;
-    private noActivityTimer?: ReturnType<typeof setInterval>;
+    private noActivityTimer?: ReturnType<typeof setTimeout>;
 
     @query('#explanation') private readonly explanation!: HTMLParagraphElement | null;
     
@@ -62,6 +62,7 @@ export class VooshSendFile extends BaseElement {
         }
 
         #explanation {
+            font-color: #000;
             padding: 20px;
             border: 6px dashed #ccc;
             border-radius: 20px;
@@ -98,20 +99,17 @@ export class VooshSendFile extends BaseElement {
     }
 
     protected updated(_changedProperties: PropertyValues): void {
-        console.log("passei 3");
         if (_changedProperties.has("confirm") && this.confirm) {
-            console.log("passei 1");
             document.body.addEventListener('click', this.onReactToDocument(this.explanation));
             document.body.addEventListener('keyup', this.onReactToDocument(this.explanation));
         } else if (_changedProperties.has("confirm") && !this.confirm) {
-            console.log("passei 2");
             document.body.removeEventListener('keyup', this.onReactToDocument(this.explanation));
             document.body.removeEventListener('click', this.onReactToDocument(this.explanation));
         }
     }
 
     disconnectedCallback(): void {
-        clearInterval(this.noActivityTimer);
+        clearTimeout(this.noActivityTimer);
         super.disconnectedCallback();
     }
 
@@ -135,7 +133,7 @@ export class VooshSendFile extends BaseElement {
             }
         }
 
-        this.clearExplanation();
+        this.clearExplanation(this.explanation);
     }
 
     onExpand() {
@@ -147,7 +145,9 @@ export class VooshSendFile extends BaseElement {
         });
         this.dispatchEvent(event);
         
+        console.log('passei 1');
         if (!this.noActivityTimer) {
+                    console.log('passei 2');
             this.onFirstCarouselItemLoad();
         }
     }
@@ -194,44 +194,61 @@ export class VooshSendFile extends BaseElement {
     }
 
     onFirstCarouselItemLoad() {
-        console.log("passei 4");
-        this.noActivityTimer = setInterval(() => {
+        const explanationElement = this.explanation;
+        setInterval(() => {
             if (this.confirm) {
-                if (this.hasAnyUserActivity !== false) {
+                if (this.hasAnyUserActivity) {
+                    if (this.noActivityTimer) {
+                        clearTimeout(this.noActivityTimer);
+                        this.noActivityTimer = undefined;
+                        this.clearExplanation(explanationElement);
+                    }
                     this.hasAnyUserActivity = false;
-                } else if (this.hasAnyUserActivity === false) {
-                    const hasTouchScreen = window.matchMedia("(pointer: coarse)").matches;
-                    const explanationElement = (this.shadowRoot || this).querySelector('#explanation')! as HTMLParagraphElement;
-                    explanationElement.innerText = "Explique o assunto do arquivo, acima, como o exemplo. Depois,";
-                    explanationElement.innerText += hasTouchScreen
-                        ? "\u00a0arraste o dedo na tela para prosseguir."
-                        : "\u00a0use a tecla \u2192 do teclado para prosseguir.";
-                    explanationElement.style.transition = 'opacity 1.1s ease';
-                    explanationElement.style.opacity = '0.7';
+                } else if (!this.noActivityTimer) {
+                    this.noActivityTimer = setTimeout(() => this.showExplanation(explanationElement), 5_000);
                 }
             }
-        }, 5_000);
+        }, 90);
     }
 
-    onReactToDocument(explanation: HTMLParagraphElement | null) {
+    showExplanation(element: HTMLParagraphElement | null) {
+        const hasTouchScreen = window.matchMedia("(pointer: coarse)").matches;
+        let message = "Explique o assunto do arquivo, acima, como o exemplo. Depois,";
+        message += hasTouchScreen
+            ? "\u00a0arraste o dedo na tela para prosseguir."
+            : "\u00a0use a tecla \u2192 do teclado para prosseguir.";
+        this.prepareAndShowExplanation(message, element);
+    }
+
+    prepareAndShowExplanation(message: string, element: HTMLParagraphElement | null) {
+        if (element) {
+            element.innerText = message;
+            element.style.transition = 'opacity 1.1s ease';
+            element.style.opacity = '0.7';
+        } else {
+            console.log("elmeent is null");
+        }
+        setTimeout(() => {
+            this.hasAnyUserActivity = true;
+        }, 11_300);
+    }
+
+    onReactToDocument(element: HTMLParagraphElement | null) {
+        const self = this;
         this.hasAnyUserActivity = true;
         return function() {
-            if (explanation) {
-                explanation.style.transition = 'opacity 0.4s ease';
-                explanation.style.opacity = '0';
-                setTimeout(() => explanation.innerText = '', 400);
-            } else {
-                console.log('explanation is null');
-            }
-        }.bind(this);
+            self.clearExplanation(element);
+        };
     }
 
-    clearExplanation() {
-        clearInterval(this.noActivityTimer);
-        const explanationElement = this.explanation!;
-        explanationElement.style.transition = 'opacity 0.4s ease';
-        explanationElement.style.opacity = '0';
-        setTimeout(() => explanationElement.textContent = '', 400);
+    clearExplanation(element: HTMLParagraphElement | null) {
+        if (element && element.textContent) {
+            element.style.transition = 'opacity 0.4s ease';
+            element.style.opacity = '0';
+            setTimeout(() => element.innerHTML = '&nbsp;', 400);
+        } else {
+            console.log('element is nullish');
+        }
     }
 
     onClickOkEventHandler() {

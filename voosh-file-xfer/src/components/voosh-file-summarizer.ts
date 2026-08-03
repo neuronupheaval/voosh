@@ -64,9 +64,6 @@ export class VooshFileSummarizer extends BaseElement {
                 background-color: #ccc;
             }
         }
-
-        p#tagBag {
-        }
 `;
 
     render() {

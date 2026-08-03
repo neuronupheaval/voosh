@@ -1,6 +1,6 @@
 import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
 import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 import { BaseElement } from "../base/BaseElement";
 import { css, CSSResultGroup, html, type PropertyValues } from "lit";
 import { Utility } from "../base/Utility";
@@ -32,11 +32,25 @@ export class VooshUploader extends BaseElement {
     private fileOffset = 0;
     private readonly chunkSize = 1024;
 
+    @state()
+    private hasAnyUserActivity: Boolean | null = null;
+    private noActivityTimer?: ReturnType<typeof setTimeout>;
+
+    @query('#explanation') private readonly explanation!: HTMLParagraphElement | null;
+
     static override styles?: CSSResultGroup | undefined = css`
         .ref {
             font-size: 1.75em;
             font-family: "Lucida Console", "Courier New", monospace;
-        }`;
+        }
+        #explanation {
+            font-color: #000;
+            padding: 20px;
+            border: 6px dashed #ccc;
+            border-radius: 20px;
+            opacity: 0;
+        }
+`;
 
     protected willUpdate(_changedProperties: PropertyValues): void {
         const self = this;
@@ -44,8 +58,9 @@ export class VooshUploader extends BaseElement {
         if (_changedProperties.has("file")) {
             console.log(`old file name = ${_changedProperties.get("file")?.name}, new file name = ${this.file?.name}`);
         }
-            
+        console.log('passei a1');
         if (this.shouldInitClient) {
+            console.log('passei a2');
             this.shouldInitClient = false;
             console.log("this.shouldInitClient vai pra false")
 
@@ -56,11 +71,80 @@ export class VooshUploader extends BaseElement {
         }
     }
 
+    protected firstUpdated(_changedProperties: PropertyValues): void {
+        const explanationElement = this.explanation;
+        setInterval(() => {
+            if (this.hasAnyUserActivity) {
+                console.log('passei a6');
+                if (this.noActivityTimer) {
+                    console.log('passei a7');
+                    clearTimeout(this.noActivityTimer);
+                    this.noActivityTimer = undefined;
+                    this.clearExplanation(explanationElement);
+                }
+                this.hasAnyUserActivity = false;
+            } else if (!this.noActivityTimer) {
+                console.log('passei a8');
+                this.noActivityTimer = setTimeout(() => this.showExplanation(explanationElement), 5_000);
+            }
+        }, 90);
+        document.body.addEventListener('click', this.onReactToDocument(this.explanation));
+        document.body.addEventListener('keyup', this.onReactToDocument(this.explanation));
+    }
+
+    showExplanation(element: HTMLParagraphElement | null) {
+        console.log('passei a11');
+        let message = 'A Ref pertence à pessoa que quer receber o arquivo. ' +
+        'Basta colar a Ref no campo da aba inicial <b>Receber arquivo</b>.';
+        this.prepareAndShowExplanation(message, element);
+    }
+
+    prepareAndShowExplanation(message: string, element: HTMLParagraphElement | null) {
+        console.log('passei a12');
+        if (element) {
+            console.log('passei a13');
+            element.innerHTML = message;
+            element.style.transition = 'opacity 1.1s ease';
+            element.style.opacity = '0.7';
+        } else {
+            console.log("elmeent is null");
+        }
+        setTimeout(() => {
+            console.log('passei a14');
+            this.hasAnyUserActivity = true;
+        }, 11_300);
+    }
+
+    onReactToDocument(element: HTMLParagraphElement | null) {
+        console.log('passei a15');
+        const self = this;
+        this.hasAnyUserActivity = true;
+        return function() {
+            console.log('passei a16');
+            self.clearExplanation(element);
+        };
+    }
+
+    clearExplanation(element: HTMLParagraphElement | null) {
+        console.log('passei a17');
+        if (element && element.textContent) {
+            console.log('passei a18');
+            element.style.transition = 'opacity 0.4s ease';
+            element.style.opacity = '0';
+            setTimeout(() => element.innerHTML = '&nbsp;', 400);
+        } else {
+            console.log('element is nullish');
+        }
+    }
+
     disconnectedCallback(): void {
+        console.log('passei a19');
         this.sender
             ?.onUpload(undefined)
             ?.offP2PHandler("ack");
         this.sender = undefined;
+        document.body.removeEventListener('keyup', this.onReactToDocument(this.explanation));
+        document.body.removeEventListener('click', this.onReactToDocument(this.explanation));
     }
 
     onSlideChanged() {
@@ -125,6 +209,7 @@ export class VooshUploader extends BaseElement {
         this.percent = Math.ceil(this.fileOffset / (this.file?.size ?? 1.000) * 100.000);
 
         return html`<h2>${this.title}</h2>
+        <p id="explanation">&nbsp;</p>
         ${
             this.percent === 0
             ? html``
