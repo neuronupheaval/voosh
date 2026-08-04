@@ -1,6 +1,7 @@
 import "@awesome.me/webawesome/dist/components/input/input.js";
 import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
 import "@awesome.me/webawesome/dist/components/button/button.js";
+import "@awesome.me/webawesome/dist/components/tag/tag.js";
 import { customElement, property, query, state } from "lit/decorators.js";
 import { BaseElement } from "../base/BaseElement";
 import { css, CSSResultGroup, html, nothing, PropertyValues } from "lit";
@@ -75,7 +76,35 @@ export class VooshReceiveFile extends BaseElement {
             border: 6px dashed #ccc;
             border-radius: 20px;
             opacity: 0;
-        }`;
+        }
+        .download {
+            display: inline-block;
+            padding: 12px 24px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            font-weight: bold;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        .download:active {
+            transform: translateY(0);
+        }
+        .icon {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4IiB2aWV3Qm94PSItMi40IC0yLjQgMjguODAgMjguODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgc3Ryb2tlPSIjMDAwMDAwIj48ZyBpZD0iU1ZHUmVwb19iZ0NhcnJpZXIiIHN0cm9rZS13aWR0aD0iMCIvPjxnIGlkPSJTVkdSZXBvX3RyYWNlckNhcnJpZXIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSIjZjI4MDAwZmZmZmYiIHN0cm9rZS13aWR0aD0iMi40OTYiPjxwYXRoIGQ9Ik0xMiAxMlYxOU0xMiAxOUw5Ljc1IDE2LjY2NjdNMTIgMTlMMTQuMjUgMTYuNjY2N002LjYgMTcuODMzM0M0LjYxMTc4IDE3LjgzMzMgMyAxNi4xOTE3IDMgMTQuMTY2N0MzIDEyLjQ5OCA0LjA5NDM4IDExLjA4OTcgNS41OTE5OCAxMC42NDU3QzUuNjU1NjIgMTAuNjI2OCA1LjcgMTAuNTY3NSA1LjcgMTAuNUM1LjcgNy40NjI0MyA4LjExNzY2IDUgMTEuMSA1QzE0LjA4MjMgNSAxNi41IDcuNDYyNDMgMTYuNSAxMC41QzE2LjUgMTAuNTU4MiAxNi41NTM2IDEwLjYwMTQgMTYuNjA5NCAxMC41ODg3QzE2Ljg2MzggMTAuNTMwNiAxNy4xMjg0IDEwLjUgMTcuNCAxMC41QzE5LjM4ODIgMTAuNSAyMSAxMi4xNDE2IDIxIDE0LjE2NjdDMjEgMTYuMTkxNyAxOS4zODgyIDE3LjgzMzMgMTcuNCAxNy44MzMzIiBzdHJva2U9IiNmMjgwMDAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz48ZyBpZD0iU1ZHUmVwb19pY29uQ2FycmllciI+PHBhdGggZD0iTTEyIDEyVjE5TTEyIDE5TDkuNzUgMTYuNjY2N00xMiAxOUwxNC4yNSAxNi42NjY3TTYuNiAxNy44MzMzQzQuNjExNzggMTcuODMzMyAzIDE2LjE5MTcgMyAxNC4xNjY3QzMgMTIuNDk4IDQuMDk0MzggMTEuMDg5NyA1LjU5MTk4IDEwLjY0NTdDNS42NTU2MiAxMC42MjY4IDUuNyAxMC41Njc1IDUuNyAxMC41QzUuNyA3LjQ2MjQzIDguMTE3NjYgNSAxMS4xIDVDMTQuMDgyMyA1IDE2LjUgNy40NjI0MyAxNi41IDEwLjVDMTYuNSAxMC41NTgyIDE2LjU1MzYgMTAuNjAxNCAxNi42MDk0IDEwLjU4ODdDMTYuODYzOCAxMC41MzA2IDE3LjEyODQgMTAuNSAxNy40IDEwLjVDMTkuMzg4MiAxMC41IDIxIDEyLjE0MTYgMjEgMTQuMTY2N0MyMSAxNi4xOTE3IDE5LjM4ODIgMTcuODMzMyAxNy40IDE3LjgzMzMiIHN0cm9rZT0iI2YyODAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPjwvc3ZnPg==');
+            background-repeat:no-repeat;
+            background-size: contain;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin: 0 6px;
+        }
+`;
 
     disconnectedCallback(): void {
         clearInterval(this.noActivityTimer);
@@ -155,18 +184,14 @@ export class VooshReceiveFile extends BaseElement {
         }
         const countClone = structuredClone(this.count);
         this.table = [ ...this.table,
-            [ html`${++countClone.value}`,
-                html`${details.fileName}`,
-                html`${Intl.NumberFormat(undefined, {maximumFractionDigits:0}).format(details.fileSize)}`,
-                html`${details.tags?.join(", ")}`,
-                html`<wa-button size="s" pill appearance="accent" variant="brand" @click=${(e: MouseEvent) => {
+            [ html`<button class="download" title="Clique pra baixar" @click=${(e: MouseEvent) => {
                     this.statusMessage = 'O download começa em breve';
                     const button = e.target as WaButton;
                     button.disabled = true;
                     button.style.opacity = '0.1';
                     this.fileName = { value: details.fileName };
                     this.fileSize = { value: details.fileSize };
-                    const trs = this.shadowRoot!.querySelectorAll(`tr:has(td:nth-child(6):not([voosh-sender='${details.sender}']))`);
+                    const trs = this.shadowRoot!.querySelectorAll(`tr:not(:has(th)):not([voosh-sender='${details.sender}'])`);
                     for (let i = 0; i < trs.length; ++i) {
                         const tr = trs[i] as HTMLTableRowElement;
                         tr.style.transition = "opacity 0.8s ease";
@@ -174,11 +199,14 @@ export class VooshReceiveFile extends BaseElement {
                         setTimeout(() => tr.remove(), 800);
                     }
                     context.download();
-                }}><img class="dl-icon" src="img/dl-icon.svg"></img></wa-button>`,
+                }}><span class="icon">\u00a0</span>${++countClone.value}</button>`,
+                html`${details.fileName}`,
+                html`${Intl.NumberFormat(undefined, {maximumFractionDigits:0}).format(details.fileSize)}`,
+                html`${details.tags?.map(tag => html`<wa-tag variant="neutral" appearance="filled">${tag}</wa-tag>`)}`,
                 details.sender
             ]
         // Remove duplicates
-        ].filter((row, index, self) => self.findIndex(r => r[5] === row[5]) === index);
+        ].filter((row, index, self) => self.findIndex(r => r[4] === row[4]) === index);
 
         this.count = countClone;
         this.shouldUpdateUI.value = true;
@@ -288,12 +316,12 @@ export class VooshReceiveFile extends BaseElement {
             [ thead, ...this.table ],
             (_, rowIndex) => rowIndex, // Row key
             (row, rowIndex) =>
-              html`<tr>
+              html`<tr voosh-sender="${row[4]}">
                 ${repeat(
                   row,
                   (_, colIndex) => `${rowIndex}-${colIndex}`, // Cell key
                   (cell, colIndex) => {
-                        if (colIndex === 5) return html`<td voosh-sender="${cell}">\u00A0</td>`;
+                        if (colIndex === 4) return nothing;
                         return rowIndex === 0 ? html`<th>${cell}</th>` : html`<td>${cell}</td>`;
                 })}
               </tr>`
