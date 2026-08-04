@@ -9,6 +9,7 @@ import { type RefMatchedResponse, VooshWebRtcClient } from "../components/voosh-
 import { when } from "lit/directives/when.js";
 import { repeat } from "lit/directives/repeat.js";
 import type WaButton from "@awesome.me/webawesome/dist/components/button/button.js"; 
+import { constants } from "../base/Constants";
 
 @customElement("voosh-receive-file")
 export class VooshReceiveFile extends BaseElement {
@@ -46,7 +47,7 @@ export class VooshReceiveFile extends BaseElement {
 
     private fileName?: { value: string; };
     private fileSize?: { value: number };
-    private readonly chunkSize = 1_024;
+    private readonly chunkSize = constants.chunkSizeInBytes;
     private opfsFile?: FileSystemFileHandle;
     private opfsWriter?: FileSystemWritableFileStream;
     private isWriterClosing = false;
@@ -66,6 +67,10 @@ export class VooshReceiveFile extends BaseElement {
         td {
             text-align: right;
             padding: 12px;
+        }
+        th {
+            text-align: left;
+            padding-right: auto;
         }
         .dl-icon {
             width: 3.9em;
@@ -96,11 +101,11 @@ export class VooshReceiveFile extends BaseElement {
             transform: translateY(0);
         }
         .icon {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4IiB2aWV3Qm94PSItMi40IC0yLjQgMjguODAgMjguODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgc3Ryb2tlPSIjMDAwMDAwIj48ZyBpZD0iU1ZHUmVwb19iZ0NhcnJpZXIiIHN0cm9rZS13aWR0aD0iMCIvPjxnIGlkPSJTVkdSZXBvX3RyYWNlckNhcnJpZXIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSIjZjI4MDAwZmZmZmYiIHN0cm9rZS13aWR0aD0iMi40OTYiPjxwYXRoIGQ9Ik0xMiAxMlYxOU0xMiAxOUw5Ljc1IDE2LjY2NjdNMTIgMTlMMTQuMjUgMTYuNjY2N002LjYgMTcuODMzM0M0LjYxMTc4IDE3LjgzMzMgMyAxNi4xOTE3IDMgMTQuMTY2N0MzIDEyLjQ5OCA0LjA5NDM4IDExLjA4OTcgNS41OTE5OCAxMC42NDU3QzUuNjU1NjIgMTAuNjI2OCA1LjcgMTAuNTY3NSA1LjcgMTAuNUM1LjcgNy40NjI0MyA4LjExNzY2IDUgMTEuMSA1QzE0LjA4MjMgNSAxNi41IDcuNDYyNDMgMTYuNSAxMC41QzE2LjUgMTAuNTU4MiAxNi41NTM2IDEwLjYwMTQgMTYuNjA5NCAxMC41ODg3QzE2Ljg2MzggMTAuNTMwNiAxNy4xMjg0IDEwLjUgMTcuNCAxMC41QzE5LjM4ODIgMTAuNSAyMSAxMi4xNDE2IDIxIDE0LjE2NjdDMjEgMTYuMTkxNyAxOS4zODgyIDE3LjgzMzMgMTcuNCAxNy44MzMzIiBzdHJva2U9IiNmMjgwMDAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz48ZyBpZD0iU1ZHUmVwb19pY29uQ2FycmllciI+PHBhdGggZD0iTTEyIDEyVjE5TTEyIDE5TDkuNzUgMTYuNjY2N00xMiAxOUwxNC4yNSAxNi42NjY3TTYuNiAxNy44MzMzQzQuNjExNzggMTcuODMzMyAzIDE2LjE5MTcgMyAxNC4xNjY3QzMgMTIuNDk4IDQuMDk0MzggMTEuMDg5NyA1LjU5MTk4IDEwLjY0NTdDNS42NTU2MiAxMC42MjY4IDUuNyAxMC41Njc1IDUuNyAxMC41QzUuNyA3LjQ2MjQzIDguMTE3NjYgNSAxMS4xIDVDMTQuMDgyMyA1IDE2LjUgNy40NjI0MyAxNi41IDEwLjVDMTYuNSAxMC41NTgyIDE2LjU1MzYgMTAuNjAxNCAxNi42MDk0IDEwLjU4ODdDMTYuODYzOCAxMC41MzA2IDE3LjEyODQgMTAuNSAxNy40IDEwLjVDMTkuMzg4MiAxMC41IDIxIDEyLjE0MTYgMjEgMTQuMTY2N0MyMSAxNi4xOTE3IDE5LjM4ODIgMTcuODMzMyAxNy40IDE3LjgzMzMiIHN0cm9rZT0iI2YyODAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPjwvc3ZnPg==');
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTA4MCIgem9vbUFuZFBhbj0ibWFnbmlmeSIgdmlld0JveD0iMCAwIDgxMCA4MDkuOTk5OTkzIiBoZWlnaHQ9IjEwODAiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiIHZlcnNpb249IjEuMCI+PGRlZnM+PGNsaXBQYXRoIGlkPSI1YWNiMDUzZTJlIj48cGF0aCBkPSJNIDEgNzIuODk4NDM4IEwgODA5IDcyLjg5ODQzOCBMIDgwOSA1ODcgTCAxIDU4NyBaIE0gMSA3Mi44OTg0MzggIiBjbGlwLXJ1bGU9Im5vbnplcm8iLz48L2NsaXBQYXRoPjwvZGVmcz48ZyBjbGlwLXBhdGg9InVybCgjNWFjYjA1M2UyZSkiPjxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik0gMzY4LjMwNDY4OCAxNDYuMjkyOTY5IEMgMjY2Ljk3MjY1NiAxNDYuMjkyOTY5IDE4NC44MjQyMTkgMjI4LjQzNzUgMTg0LjgyNDIxOSAzMjkuNzY5NTMxIEMgMTg0LjgyNDIxOSAzNTAuMDM5MDYyIDE2OC4zOTQ1MzEgMzY2LjQ2ODc1IDE0OC4xMjg5MDYgMzY2LjQ2ODc1IEMgMTA3LjU5NzY1NiAzNjYuNDY4NzUgNzQuNzM4MjgxIDM5OS4zMjQyMTkgNzQuNzM4MjgxIDQzOS44NTkzNzUgQyA3NC43MzgyODEgNDgwLjM5NDUzMSAxMDcuNTk3NjU2IDUxMy4yNSAxNDguMTI4OTA2IDUxMy4yNSBMIDE5NCA1MTMuMjUgTCAxOTQgNTg2LjY0MDYyNSBMIDE0OC4xMjg5MDYgNTg2LjY0MDYyNSBDIDY3LjA2MjUgNTg2LjY0MDYyNSAxLjM0Mzc1IDUyMC45MjE4NzUgMS4zNDM3NSA0MzkuODU5Mzc1IEMgMS4zNDM3NSAzNzAuNzI2NTYyIDQ5LjEzNjcxOSAzMTIuNzU3ODEyIDExMy40ODA0NjkgMjk3LjE4NzUgQyAxMjkuNDkyMTg4IDE3MC43MDcwMzEgMjM3LjQ3NjU2MiA3Mi44OTg0MzggMzY4LjMwNDY4OCA3Mi44OTg0MzggQyA0NzEuNDI1NzgxIDcyLjg5ODQzOCA1NjAuMjg1MTU2IDEzMy42NDQ1MzEgNjAxLjE3OTY4OCAyMjEuMjQyMTg4IEMgNjA5LjA0Mjk2OSAyMjAuMjE0ODQ0IDYxNy4wNTA3ODEgMjE5LjY4MzU5NCA2MjUuMTc1NzgxIDIxOS42ODM1OTQgQyA3MjYuNTA3ODEyIDIxOS42ODM1OTQgODA4LjY1NjI1IDMwMS44MzIwMzEgODA4LjY1NjI1IDQwMy4xNjQwNjIgQyA4MDguNjU2MjUgNDUwLjUzNTE1NiA3OTQuODI4MTI1IDQ5Ni4wMDM5MDYgNzY2LjQxNDA2MiA1MzAuMzQ3NjU2IEMgNzM3LjQyMTg3NSA1NjUuMzkwNjI1IDY5NC45MTc5NjkgNTg2LjY0MDYyNSA2NDMuNTIzNDM4IDU4Ni42NDA2MjUgTCA2MTYgNTg2LjY0MDYyNSBMIDYxNiA1MTMuMjUgTCA2NDMuNTIzNDM4IDUxMy4yNSBDIDY3My4xOTE0MDYgNTEzLjI1IDY5NC45MTAxNTYgNTAxLjY0NDUzMSA3MDkuODY3MTg4IDQ4My41NjI1IEMgNzI1LjQwNjI1IDQ2NC43ODEyNSA3MzUuMjYxNzE5IDQzNi44NTU0NjkgNzM1LjI2MTcxOSA0MDMuMTY0MDYyIEMgNzM1LjI2MTcxOSAzNDIuMzYzMjgxIDY4NS45NzY1NjIgMjkzLjA3NDIxOSA2MjUuMTc1NzgxIDI5My4wNzQyMTkgQyA2MTIuODY3MTg4IDI5My4wNzQyMTkgNjAxLjEwMTU2MiAyOTUuMDgyMDMxIDU5MC4xNDQ1MzEgMjk4Ljc1MzkwNiBDIDU4MC43OTI5NjkgMzAxLjg5MDYyNSA1NzAuNTc0MjE5IDMwMS4xMzI4MTIgNTYxLjc4OTA2MiAyOTYuNjQ4NDM4IEMgNTUzLjAwMzkwNiAyOTIuMTY0MDYyIDU0Ni4zOTg0MzggMjg0LjMzMjAzMSA1NDMuNDUzMTI1IDI3NC45MTc5NjkgQyA1MjAuMTI1IDIwMC4zMzk4NDQgNDUwLjQ4MDQ2OSAxNDYuMjkyOTY5IDM2OC4zMDQ2ODggMTQ2LjI5Mjk2OSBaIE0gMzY4LjMwNDY4OCAxNDYuMjkyOTY5ICIgZmlsbC1vcGFjaXR5PSIxIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L2c+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTSAzNjguMzA0Njg4IDQzOS44NTkzNzUgTCA0NDEuNjk1MzEyIDQzOS44NTkzNzUgTCA0NDEuNjk1MzEyIDY3OC4zODI4MTIgTCAzNjguMzA0Njg4IDY3OC4zODI4MTIgWiBNIDM2OC4zMDQ2ODggNDM5Ljg1OTM3NSAiIGZpbGwtb3BhY2l0eT0iMSIgZmlsbC1ydWxlPSJldmVub2RkIi8+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTSAzNzkuMDU0Njg4IDcyMi42NzU3ODEgTCAyNjguOTY4NzUgNjEyLjU4OTg0NCBMIDMyMC44NjMyODEgNTYwLjY5NTMxMiBMIDQwNS4wMDM5MDYgNjQ0LjgzNTkzOCBMIDQ4OS4xNDQ1MzEgNTYwLjY5NTMxMiBMIDU0MS4wMzkwNjIgNjEyLjU4OTg0NCBMIDQzMC45NTMxMjUgNzIyLjY3NTc4MSBDIDQxNi42MjEwOTQgNzM3LjAwNzgxMiAzOTMuMzg2NzE5IDczNy4wMDc4MTIgMzc5LjA1NDY4OCA3MjIuNjc1NzgxIFogTSAzNzkuMDU0Njg4IDcyMi42NzU3ODEgIiBmaWxsLW9wYWNpdHk9IjEiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==');
             background-repeat:no-repeat;
             background-size: contain;
             display: inline-block;
-            width: 18px;
+            width: 20px;
             height: 18px;
             margin: 0 6px;
         }
@@ -199,7 +204,7 @@ export class VooshReceiveFile extends BaseElement {
                         setTimeout(() => tr.remove(), 800);
                     }
                     context.download();
-                }}><span class="icon">\u00a0</span>${++countClone.value}</button>`,
+                }}><span class="icon" role="img">\u00a0</span><span role="listitem">${++countClone.value}</span></button>`,
                 html`${details.fileName}`,
                 html`${Intl.NumberFormat(undefined, {maximumFractionDigits:0}).format(details.fileSize)}`,
                 html`${details.tags?.map(tag => html`<wa-tag variant="neutral" appearance="filled">${tag}</wa-tag>`)}`,
@@ -305,7 +310,7 @@ export class VooshReceiveFile extends BaseElement {
     }
 
     render() {
-        const thead = [ html`número`, html`nome do arquivo`, html`tamanho`, html`tags`, html`&nbsp;` ];
+        const thead = [ html`número`, html`nome do arquivo`, html`tamanho`, html`tags` ];
         const percent = Math.ceil(this.fileOffset / (this.fileSize?.value ?? 1.000) * 100.000)
         return when(this.confirm, 
             () => html`<wa-input label="Digite Ref"
