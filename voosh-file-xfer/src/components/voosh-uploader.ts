@@ -6,6 +6,7 @@ import { css, CSSResultGroup, html, type PropertyValues } from "lit";
 import { Utility } from "../base/Utility";
 import { until } from "lit/directives/until.js";
 import { VooshWebRtcClient } from "./voosh-webrtc-client";
+import { constants } from "../base/Constants";
 
 @customElement("voosh-uploader")
 export class VooshUploader extends BaseElement {
@@ -30,7 +31,7 @@ export class VooshUploader extends BaseElement {
     timer?: ReturnType<typeof setTimeout>;
 
     private fileOffset = 0;
-    private readonly chunkSize = 1024;
+    private readonly chunkSize = constants.chunkSizeInBytes;
 
     @state()
     private hasAnyUserActivity: Boolean | null = null;
@@ -58,12 +59,8 @@ export class VooshUploader extends BaseElement {
         if (_changedProperties.has("file")) {
             console.log(`old file name = ${_changedProperties.get("file")?.name}, new file name = ${this.file?.name}`);
         }
-        console.log('passei a1');
         if (this.shouldInitClient) {
-            console.log('passei a2');
             this.shouldInitClient = false;
-            console.log("this.shouldInitClient vai pra false")
-
             this.sender = new VooshWebRtcClient(() => import.meta.env.VITE_SIGNALING_ENDPOINT_URL)
                 .onUpload((ref, sender) => this.onUpload(ref, sender))
                 .onP2PHandler("ack", (_, __, context) => self.sendFile(context))
@@ -75,16 +72,13 @@ export class VooshUploader extends BaseElement {
         const explanationElement = this.explanation;
         setInterval(() => {
             if (this.hasAnyUserActivity) {
-                console.log('passei a6');
                 if (this.noActivityTimer) {
-                    console.log('passei a7');
                     clearTimeout(this.noActivityTimer);
                     this.noActivityTimer = undefined;
                     this.clearExplanation(explanationElement);
                 }
                 this.hasAnyUserActivity = false;
             } else if (!this.noActivityTimer) {
-                console.log('passei a8');
                 this.noActivityTimer = setTimeout(() => this.showExplanation(explanationElement), 5_000);
             }
         }, 90);
@@ -93,42 +87,31 @@ export class VooshUploader extends BaseElement {
     }
 
     showExplanation(element: HTMLParagraphElement | null) {
-        console.log('passei a11');
         let message = 'A Ref pertence à pessoa que quer receber o arquivo. ' +
         'Basta colar a Ref no campo da aba inicial <b>Receber arquivo</b>.';
         this.prepareAndShowExplanation(message, element);
     }
 
     prepareAndShowExplanation(message: string, element: HTMLParagraphElement | null) {
-        console.log('passei a12');
         if (element) {
-            console.log('passei a13');
             element.innerHTML = message;
             element.style.transition = 'opacity 1.1s ease';
             element.style.opacity = '0.7';
         } else {
             console.log("elmeent is null");
         }
-        setTimeout(() => {
-            console.log('passei a14');
-            this.hasAnyUserActivity = true;
-        }, 11_300);
     }
 
     onReactToDocument(element: HTMLParagraphElement | null) {
-        console.log('passei a15');
         const self = this;
         this.hasAnyUserActivity = true;
         return function() {
-            console.log('passei a16');
             self.clearExplanation(element);
         };
     }
 
     clearExplanation(element: HTMLParagraphElement | null) {
-        console.log('passei a17');
         if (element && element.textContent) {
-            console.log('passei a18');
             element.style.transition = 'opacity 0.4s ease';
             element.style.opacity = '0';
             setTimeout(() => element.innerHTML = '&nbsp;', 400);
@@ -138,7 +121,6 @@ export class VooshUploader extends BaseElement {
     }
 
     disconnectedCallback(): void {
-        console.log('passei a19');
         this.sender
             ?.onUpload(undefined)
             ?.offP2PHandler("ack");
@@ -148,7 +130,6 @@ export class VooshUploader extends BaseElement {
     }
 
     onSlideChanged() {
-        console.log(`this.shouldInitClient vai pra true`);
         this.shouldInitClient = true;
     }
 
