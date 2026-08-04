@@ -71,7 +71,10 @@ export class VooshWebRtcClient {
     private readonly p2pResolverTimers: Map<string, number>;
 
     private cannotUploadFurther = false;
-    private readonly basicTimeoutForP2PInMs = 2_800; // Possible values: 0.2x, 1x, 2x, 17x.
+    private readonly basicTimeoutForP2PInMs = 2_800; // Possible values: 0.125x, 0.2x, 1x, 2x, 2.5x, 17x.
+
+    private retryIceCandidateTimer?: ReturnType<typeof setTimeout>;
+    private retryOpenWsTimer?: ReturnType<typeof setTimeout>;
 
     constructor(signalingServerUrlDeferred: () => string) {
         if (signalingServerUrlDeferred) {
@@ -130,10 +133,18 @@ export class VooshWebRtcClient {
     }
 
     private connectToSignalingServer() {
-        if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
-            this.ws = new WebSocket(this.signalingServerUrlDeferred());
-        } else {
-            console.warn(`Things do not look neat, signaling server closed the connection`);
+        if (!this.retryOpenWsTimer) {
+            const self = this;
+            this.retryOpenWsTimer = (function loop() {
+                return setTimeout(() => {
+                    if (!self.ws || self.ws.readyState === WebSocket.CLOSED) {
+                        self.ws = new WebSocket(self.signalingServerUrlDeferred());
+                    } else {
+                        console.log(' retrying ws');
+                        self.retryOpenWsTimer = loop();
+                    }
+                }, self.basicTimeoutForP2PInMs >>> 3);
+            })();
         }
     }
 
@@ -307,7 +318,6 @@ export class VooshWebRtcClient {
                             type: type
                         });
                         this.isRemoteDescriptionSet = true;
-                        this.flushIceCandidateQueue();
                         const answer = await this.peerConnection!.createAnswer();
                         await this.gotReceiverP2PDescription(this.peerConnection!, answer);
                         console.log("signaling server received sender description message");
@@ -328,7 +338,6 @@ export class VooshWebRtcClient {
                             type: type
                         });
                         this.isRemoteDescriptionSet = true;
-                        this.flushIceCandidateQueue();
                     }, this.basicTimeoutForP2PInMs);
                     break;
                 }
@@ -401,8 +410,19 @@ export class VooshWebRtcClient {
 
     private addIceCandidate(candidate: RTCIceCandidate) {
         this.messageQueueIceCandidate.push(candidate);
-        if (this.isRemoteDescriptionSet) {
-            this.flushIceCandidateQueue();
+        console.log('w3');
+        if (!this.retryIceCandidateTimer) {
+            const self = this;
+            this.retryIceCandidateTimer = (function loop () {
+                return setTimeout(() => {
+                    if (self.isRemoteDescriptionSet) {
+                        self.flushIceCandidateQueue();
+                    } else {
+                        console.log('retry ice');
+                        self.retryIceCandidateTimer = loop();
+                    }
+                }, self.basicTimeoutForP2PInMs >>> 3);
+            })();
         } else {
             console.log(`remote description has not been set yet`);
         }
