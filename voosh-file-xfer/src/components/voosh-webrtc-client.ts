@@ -150,7 +150,7 @@ export class VooshWebRtcClient {
                     if (!self.ws || self.ws.readyState === WebSocket.CLOSED) {
                         self.ws = new WebSocket(self.signalingServerUrlDeferred());
                         self.reconnectAttempts = 0;
-                    } else {
+                    } else if (self.ws.readyState !== WebSocket.OPEN) {
                         console.log(' r w');
                         self.retryOpenWsTimer = loop();
                     }
