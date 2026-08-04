@@ -145,9 +145,7 @@ export class VooshSendFile extends BaseElement {
         });
         this.dispatchEvent(event);
         
-        console.log('passei 1');
         if (!this.noActivityTimer) {
-                    console.log('passei 2');
             this.onFirstCarouselItemLoad();
         }
     }
@@ -228,9 +226,6 @@ export class VooshSendFile extends BaseElement {
         } else {
             console.log("elmeent is null");
         }
-        setTimeout(() => {
-            this.hasAnyUserActivity = true;
-        }, 11_300);
     }
 
     onReactToDocument(element: HTMLParagraphElement | null) {
