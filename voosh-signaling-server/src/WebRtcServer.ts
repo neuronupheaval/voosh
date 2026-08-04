@@ -17,8 +17,8 @@ wss.on('connection', (ws, req) => {
   ws.send(JSON.stringify(getSetupMessage()));
 
   function getWelcomeMessage() {
-    const r = rsa.exportKey("public");
-    return { type: 'welcome', id: clientId, r: r };
+    const s = rsa.exportKey("public");
+    return { type: 'welcome', id: clientId, s: s };
   }
 
   function getSetupMessage() {
