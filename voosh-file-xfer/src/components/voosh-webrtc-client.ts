@@ -165,7 +165,7 @@ export class VooshWebRtcClient {
             return;
         }
         console.log(`Signaling link lost. Retrying #${this.reconnectAttempts + 1} out of ${this.maxAttempts} in ${Math.round(this.calculateWsOpenDelay())}ms`);
-        this.connectToSignalingServer(this.calculateWsOpenDelay);
+        this.connectToSignalingServer(this.calculateWsOpenDelay.bind(this));
         this.reconnectAttempts++;
     }
 
@@ -235,7 +235,7 @@ export class VooshWebRtcClient {
 
                 case 'welcome':
                     this.myId = this.myId || message.id;
-                    this.s = message.r;
+                    this.s = message.s;
                     this.sendToSignalingServer({
                         type: 'welcomeAck',
                         sender: message.id,
