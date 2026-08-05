@@ -8,6 +8,8 @@ import { until } from "lit/directives/until.js";
 import { VooshWebRtcClient } from "./voosh-webrtc-client";
 import { constants } from "../base/Constants";
 
+var reloadButtonTimer: ReturnType<typeof setTimeout>;
+
 @customElement("voosh-uploader")
 export class VooshUploader extends BaseElement {
     sender?: VooshWebRtcClient;
@@ -30,6 +32,7 @@ export class VooshUploader extends BaseElement {
     percent: number = 0;
     timer?: ReturnType<typeof setTimeout>;
 
+    @state()
     private fileOffset = 0;
     private readonly chunkSize = constants.chunkSizeInBytes;
 
@@ -51,6 +54,12 @@ export class VooshUploader extends BaseElement {
             border-radius: 20px;
             opacity: 0;
         }
+        .button-container {
+            padding-top: 18px;
+            display: none;
+            opacity: '0';
+            text-align: center;
+        }
 `;
 
     protected willUpdate(_changedProperties: PropertyValues): void {
@@ -65,6 +74,9 @@ export class VooshUploader extends BaseElement {
                 .onUpload((ref, sender) => this.onUpload(ref, sender))
                 .onP2PHandler("ack", (_, __, context) => self.sendFile(context))
                 .prepare();
+        }
+        if (this.file && this.fileOffset >= this.file.size) {
+            this.showReloadButton();
         }
     }
 
@@ -130,6 +142,25 @@ export class VooshUploader extends BaseElement {
         }, 90);
         document.body.addEventListener('click', this.onReactToDocument(element));
         document.body.addEventListener('keyup', this.onReactToDocument(element));
+    }
+
+    showReloadButton() {
+        const buttonContainer = (this.shadowRoot || this).querySelector(".button-container") as HTMLDivElement;
+        buttonContainer.style.display = 'block';
+        buttonContainer.style.transition = 'opacity 0.8s ease';
+        buttonContainer.style.opacity = '1';
+        const button = buttonContainer.querySelector(".btn") as HTMLButtonElement;
+        let count = 5;
+        reloadButtonTimer = (function loop () {
+            return setTimeout(() => {
+                if (count >= 0) {
+                    button.textContent = 'Recarregando em ' + (count--) + 's...';
+                    reloadButtonTimer = loop();
+                } else {
+                    button.click();
+                }
+            }, 1_000);
+        })();
     }
 
     async sendFile(context: { sendMessage(payload: any): void }) {
@@ -200,6 +231,10 @@ export class VooshUploader extends BaseElement {
         <p id="board">
             <h3>Ref: <span aria-label="Ref!" class="ref">${this.ref}</span> <wa-copy-button tooltip-placement="right" 
             copy-label="Copiar" success-label="Copiado!" error-label="ERRO" value=${ until(Utility.getRef(this.file), "aguarde")}></wa-copy-button></h3>
-        </p>`;
+        </p>
+        <div class="button-container"><button class="btn" @click="${() => {
+            clearTimeout(reloadButtonTimer); 
+            location.reload();
+        }}"></button></div>`;
     }    
 }
