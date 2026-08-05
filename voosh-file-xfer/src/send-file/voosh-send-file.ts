@@ -230,8 +230,8 @@ export class VooshSendFile extends BaseElement {
 
     onReactToDocument(element: HTMLParagraphElement | null) {
         const self = this;
-        this.hasAnyUserActivity = true;
         return function() {
+            self.hasAnyUserActivity = true;
             self.clearExplanation(element);
         };
     }

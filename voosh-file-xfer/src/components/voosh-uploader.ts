@@ -68,27 +68,10 @@ export class VooshUploader extends BaseElement {
         }
     }
 
-    protected firstUpdated(_changedProperties: PropertyValues): void {
-        const explanationElement = this.explanation;
-        setInterval(() => {
-            if (this.hasAnyUserActivity) {
-                if (this.noActivityTimer) {
-                    clearTimeout(this.noActivityTimer);
-                    this.noActivityTimer = undefined;
-                    this.clearExplanation(explanationElement);
-                }
-                this.hasAnyUserActivity = false;
-            } else if (!this.noActivityTimer) {
-                this.noActivityTimer = setTimeout(() => this.showExplanation(explanationElement), 5_000);
-            }
-        }, 90);
-        document.body.addEventListener('click', this.onReactToDocument(this.explanation));
-        document.body.addEventListener('keyup', this.onReactToDocument(this.explanation));
-    }
-
     showExplanation(element: HTMLParagraphElement | null) {
-        let message = 'A Ref pertence à pessoa que quer receber o arquivo. ' +
-        'Basta colar a Ref no campo da aba inicial <b>Receber arquivo</b>.';
+        let message = 'A Ref abaixo é para a pessoa que receberá o arquivo. ' +
+        'Mande para ela uma mensagem de Whatsapp com a Ref e ' +
+        'diga para colar em <i>Receber arquivo</i>.';
         this.prepareAndShowExplanation(message, element);
     }
 
@@ -104,8 +87,8 @@ export class VooshUploader extends BaseElement {
 
     onReactToDocument(element: HTMLParagraphElement | null) {
         const self = this;
-        this.hasAnyUserActivity = true;
         return function() {
+            self.hasAnyUserActivity = true;
             self.clearExplanation(element);
         };
     }
@@ -125,12 +108,28 @@ export class VooshUploader extends BaseElement {
             ?.onUpload(undefined)
             ?.offP2PHandler("ack");
         this.sender = undefined;
-        document.body.removeEventListener('keyup', this.onReactToDocument(this.explanation));
-        document.body.removeEventListener('click', this.onReactToDocument(this.explanation));
     }
 
     onSlideChanged() {
         this.shouldInitClient = true;
+        const element = this.explanation;
+        setInterval(() => {
+            if (this.hasAnyUserActivity === true) {
+                console.warn('itz true');
+            }
+            if (this.hasAnyUserActivity) {
+                this.hasAnyUserActivity = false;
+                if (this.noActivityTimer) {
+                    clearTimeout(this.noActivityTimer);
+                    this.noActivityTimer = undefined;
+                    this.clearExplanation(element);
+                }
+            } else if (!this.noActivityTimer) {
+                this.noActivityTimer = setTimeout(() => this.showExplanation(element), 5_000);
+            }
+        }, 90);
+        document.body.addEventListener('click', this.onReactToDocument(element));
+        document.body.addEventListener('keyup', this.onReactToDocument(element));
     }
 
     async sendFile(context: { sendMessage(payload: any): void }) {
@@ -199,7 +198,8 @@ export class VooshUploader extends BaseElement {
                 </wa-progress-bar>`
         }
         <p id="board">
-            <h3>Ref: <span aria-label="Ref!" class="ref">${this.ref}</span> <wa-copy-button tooltip-placement="right" value=${ until(Utility.getRef(this.file), "aguarde")}></wa-copy-button></h3>
+            <h3>Ref: <span aria-label="Ref!" class="ref">${this.ref}</span> <wa-copy-button tooltip-placement="right" 
+            copy-label="Copiar" success-label="Copiado!" error-label="ERRO" value=${ until(Utility.getRef(this.file), "aguarde")}></wa-copy-button></h3>
         </p>`;
     }    
 }
