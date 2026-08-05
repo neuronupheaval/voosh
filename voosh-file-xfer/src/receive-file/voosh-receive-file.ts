@@ -8,8 +8,9 @@ import { css, CSSResultGroup, html, nothing, PropertyValues } from "lit";
 import { type RefMatchedResponse, VooshWebRtcClient } from "../components/voosh-webrtc-client";
 import { when } from "lit/directives/when.js";
 import { repeat } from "lit/directives/repeat.js";
-import type WaButton from "@awesome.me/webawesome/dist/components/button/button.js"; 
 import { constants } from "../base/Constants";
+
+var reloadButtonTimer: ReturnType<typeof setTimeout>;
 
 @customElement("voosh-receive-file")
 export class VooshReceiveFile extends BaseElement {
@@ -40,7 +41,7 @@ export class VooshReceiveFile extends BaseElement {
 
     @state()
     private hasAnyUserActivity: Boolean | null = null;
-    private noActivityTimer?: ReturnType<typeof setInterval>;
+    private noActivityTimer?: ReturnType<typeof setTimeout>;
 
     @query('#explanation')
     private readonly explanation!: HTMLParagraphElement | null;
@@ -82,7 +83,7 @@ export class VooshReceiveFile extends BaseElement {
             border-radius: 20px;
             opacity: 0;
         }
-        .download {
+        .btn {
             display: inline-block;
             padding: 12px 24px;
             cursor: pointer;
@@ -93,11 +94,11 @@ export class VooshReceiveFile extends BaseElement {
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .download:hover {
+        .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
-        .download:active {
+        .btn:active {
             transform: translateY(0);
         }
         .icon {
@@ -108,6 +109,12 @@ export class VooshReceiveFile extends BaseElement {
             width: 20px;
             height: 18px;
             margin: 0 6px;
+        }
+        .button-container {
+            padding-top: 18px;
+            display: none;
+            opacity: '0';
+            text-align: center;
         }
 `;
 
@@ -126,6 +133,30 @@ export class VooshReceiveFile extends BaseElement {
             document.body.removeEventListener('keyup', this.onReactToDocument(this.explanation));
             document.body.removeEventListener('click', this.onReactToDocument(this.explanation));
         }
+
+        if (this.fileOffset >= this.fileSize!.value) {
+            this.showReloadButton();
+        }
+    }
+
+    showReloadButton() {
+        const buttonContainer = (this.shadowRoot || this).querySelector(".button-container") as HTMLDivElement;
+        buttonContainer.style.display = 'block';
+        buttonContainer.style.transition = 'opacity 0.8s ease';
+        buttonContainer.style.opacity = '1';
+        const button = buttonContainer.querySelector(".btn") as HTMLButtonElement;
+        let count = 10;
+        const self = this;
+        reloadButtonTimer = (function loop () {
+            return setTimeout(() => {
+                if (count >= 0) {
+                    button.textContent = 'Recarregando em ' + (count--) + 's...';
+                    reloadButtonTimer = loop();
+                } else {
+                    button.click();
+                }
+            }, 1_000);
+        })();
     }
 
     onExpand() {
@@ -189,9 +220,9 @@ export class VooshReceiveFile extends BaseElement {
         }
         const countClone = structuredClone(this.count);
         this.table = [ ...this.table,
-            [ html`<button class="download" title="Clique pra baixar" @click=${(e: MouseEvent) => {
+            [ html`<button class="btn" title="Clique pra baixar" @click=${(e: MouseEvent) => {
                     this.statusMessage = 'O download começa em breve';
-                    const button = e.target as WaButton;
+                    const button = e.target as HTMLButtonElement;
                     button.disabled = true;
                     button.style.opacity = '0.1';
                     this.fileName = { value: details.fileName };
@@ -339,7 +370,11 @@ export class VooshReceiveFile extends BaseElement {
             : html`<wa-progress-bar id="progress-bar" .value=${percent}>
                 ${percent >= 100.0 ? html`finalizado` : html`${percent}%`}
                 </wa-progress-bar>`
-        }`,
+        }
+        <div class="button-container"><button class="btn" @click="${() => {
+            clearTimeout(reloadButtonTimer); 
+            location.reload();
+        }}"></button></div>`,
         () => html`not ready`)
     }
 }
