@@ -134,7 +134,7 @@ export class VooshReceiveFile extends BaseElement {
             document.body.removeEventListener('click', this.onReactToDocument(this.explanation));
         }
 
-        if (this.fileOffset >= this.fileSize!.value) {
+        if (this.fileSize && this.fileOffset >= this.fileSize.value) {
             this.showReloadButton();
         }
     }
@@ -342,7 +342,7 @@ export class VooshReceiveFile extends BaseElement {
 
     render() {
         const thead = [ html`número`, html`nome do arquivo`, html`tamanho`, html`tags` ];
-        const percent = Math.ceil(this.fileOffset / (this.fileSize?.value ?? 1.000) * 100.000)
+        const percent = Math.ceil(this.fileOffset / (this.fileSize?.value || 1.000) * 100.000)
         return when(this.confirm, 
             () => html`<wa-input label="Digite Ref"
             appearance="filled-outlined" size="m" pill maxlength="8" @input=${this.onRefInput}></wa-input>
